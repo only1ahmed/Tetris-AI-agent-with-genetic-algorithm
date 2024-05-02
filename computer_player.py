@@ -1,6 +1,3 @@
-import tetris_base
-
-
 # IMPORTANT NOTES:
 # The board contains two type of characters (.) and (O) "without brackets"
 # (.) means that the cell is BLANK "it is declared as BLANK globaly, so use it"
@@ -42,32 +39,32 @@ def rows_cleared_effect(current_board, previous_board):
 
 
 # max(Max height - 8, 0) so simple, right?
-def height_effect():
+def height_effect(board):
     pass
 
 
 # empty columns - 1, even more simple!
-def columns_effect():
+def columns_effect(board):
     pass
 
 
 # NOTE: MAKE SURE TO INCREASE THE REWARD FOR MORE CONSECUTIVE ROWS
 
 # Reward for each *1* consecutive row with 1 column (the same column) only empty.
-def one_rows_effect():
+def one_rows_effect(board):
     pass
 
 
 # Reward for each *2* consecutive row with 2 column (the same column) only empty.
-def two_rows_effect():
+def two_rows_effect(board):
     pass
 
 
 # Reward for each *3* consecutive row with 3 column (the same column) only empty.
-def three_rows_effect():
+def three_rows_effect(board):
     pass
 
 
 # Reward for each *4* consecutive row with 4 column (the same column) only empty.
-def four_rows_effect():
+def four_rows_effect(board):
     pass

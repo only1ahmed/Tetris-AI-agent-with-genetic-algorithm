@@ -1,5 +1,5 @@
-import tetris_base
 import computer_player
+import random
 
 NUM_OF_GENES = 9
 COUNT_OF_CHROMOSOMES = 15
