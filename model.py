@@ -1,4 +1,4 @@
-import computer_player
+import Computer_player
 import random
 
 NUM_OF_GENES = 9
