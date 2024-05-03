@@ -1,4 +1,5 @@
 import Computer_player
+import Tetris_base
 import random
 
 NUM_OF_GENES = 9
@@ -18,37 +19,45 @@ class Chromosom:
             self.Genes = genes
 
 
-# NOTE: maybe try to apply some sort of dynamic inputing to the global chromosoms (not nessacary)
+# KHALED
+# NOTE: maybe try to take chromosoms as an input (not nessacary)
 def init_chromosoms(mode=None):
     for i in range(COUNT_OF_CHROMOSOMES):
         CHROMOSOMS.append(Chromosom())
 
 
+# MOHSEN
 # The main function for training the chromosomes
+# Note: When using run_game() function, make sure to pass (False, chromosome)
 def train():
     pass
 
 
+# FAWZY
 # Apply ecolution on chromosomes
 def evolute():
     pass
 
 
+# FAWZY
 # Play the game and evaluate the final score of the given chromosom (The highest final score the better)
 def evaluate(chromosom):
     pass
 
 
+# OMAR
 # Select the best suited chromosomes for the next stage of mating
 def selection(scores):
     pass
 
 
+# OMAR
 # Mate chromosomes to get the new generation
 def crossover():
     pass
 
 
+# MOHSEN
 # Mutate some of the chromosomes of the new generation
 def mutate():
     pass

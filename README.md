@@ -11,8 +11,10 @@ It is where the game is actually gonna run.
 
 You won't have to deal with this file at all except for debugging when running the game.
 
+The run_game() function return the game score after it is finished
+
 ## Model
-This file contains all the genetic algorithm logic, it uses Computer_player to test the chromosomes and evolute.
+This file contains all the genetic algorithm logic, it uses Tetris_base to train and test the chromosomes and evolute.
 
 ## Computer_player
 This file contains all the AI player logic for making moves, which consists of:
