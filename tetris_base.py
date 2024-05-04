@@ -370,16 +370,20 @@ def run_game(mode, chromosom=None):
                 last_fall_time = time.time()
 
         # Drawing everything on the screen
+        # NOTE: put a if statment to check if the game mode is training mode, for less time consumption (don't include what is below the line of #s)
         DISPLAYSURF.fill(BGCOLOR)
         draw_board(board)
         draw_status(score, level)
         draw_next_piece(next_piece)
-
+        ##########################################################################
         if falling_piece != None:
             draw_piece(falling_piece)
 
+        # NOTE: put a if statment to check if the game mode is training mode, for less time consumption
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+        ##########################################################################
+
     return score
 
 ##############################################################################
