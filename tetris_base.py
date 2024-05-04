@@ -170,7 +170,10 @@ PIECES = {'S': S_SHAPE_TEMPLATE,
           'T': T_SHAPE_TEMPLATE}
 
 # Define if the game is manual or not
-MANUAL_GAME = True
+MANUAL_GAME = 1
+AUTO_GAME = 2
+TRAINING_MODE = 3
+
 
 ##############################################################################
 # MAIN GAME
@@ -187,7 +190,7 @@ def main():
     BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
     pygame.display.set_caption('Tetris AI')
 
-    run_game(False)
+    run_game(AUTO_GAME)
 
 
 # The run game function will return score after finishing the game
@@ -306,10 +309,21 @@ def run_game(mode, chromosom=None):
                         falling_piece['y'] += i - 1
 
         # The computer player move
-        else:
+        elif mode is AUTO_GAME:
             if Piece_falling:
-                Computer_player.computer_plays(board, chromosom)
+                Computer_player.computer_plays(board, falling_piece, chromosom)
                 Piece_falling = False
+        elif mode is TRAINING_MODE:
+            Computer_player.computer_plays(board, falling_piece, chromosom)
+            moving_down = False
+            moving_left = False
+            moving_right = False
+
+            for i in range(1, BOARDHEIGHT):
+                if (not is_valid_position(board, falling_piece, adj_Y=i)):
+                    break
+
+            falling_piece['y'] += i - 1
 
         # Handle moving the piece because of user input
         if (moving_left or moving_right) and time.time() - last_moveside_time > MOVESIDEWAYSFREQ:
