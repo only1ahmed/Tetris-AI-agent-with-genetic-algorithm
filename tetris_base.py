@@ -180,7 +180,9 @@ TRAINING_MODE = 3
 ##############################################################################
 
 
-def main():
+# The run game function will return score after finishing the game
+def run_game(mode, chromosom=None):
+    # Setup Pygame board
     global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
     pygame.init()
 
@@ -190,11 +192,6 @@ def main():
     BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
     pygame.display.set_caption('Tetris AI')
 
-    run_game(AUTO_GAME)
-
-
-# The run game function will return score after finishing the game
-def run_game(mode, chromosom=None):
     # Setup variables
     board = get_blank_board()
     last_movedown_time = time.time()
@@ -802,4 +799,4 @@ def calc_sides_in_contact(board, piece):
     return piece_sides, floor_sides, wall_sides
 
 
-main()
+run_game(MANUAL_GAME)
