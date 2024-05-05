@@ -33,10 +33,13 @@ class Chromosome:
         best_rotation = 0
         play_score = -10000000
 
+        # TODO: write formula
         for rot in range(self.tetris_game.PIECES[piece['shape']]):
             # use calc_move_data 
             # calculate the score for each rotation and return the best rotation and its score
             # dot multiplication baby
+            # for the next_piece you could get the new_board from the first piece and recalculate the
+            # calc_move_data based on the next_piece
             pass
 
         return best_rotation,play_score
