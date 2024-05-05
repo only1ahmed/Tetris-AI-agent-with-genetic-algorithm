@@ -1,5 +1,5 @@
-import Computer_player
-import Tetris_base
+import computer_player
+import tetris_base
 import random
 
 NUM_OF_GENES = 9

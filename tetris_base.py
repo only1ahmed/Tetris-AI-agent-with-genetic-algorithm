@@ -3,7 +3,7 @@ import time
 import pygame
 import sys
 from pygame.locals import *
-import Computer_player
+import computer_player
 ##############################################################################
 # SETTING UP GENERAL CONSTANTS
 ##############################################################################
