@@ -3,7 +3,7 @@ import time
 import pygame
 import sys
 from pygame.locals import *
-import computer_player
+import computer_player #TODO:
 ##############################################################################
 # SETTING UP GENERAL CONSTANTS
 ##############################################################################
@@ -308,10 +308,10 @@ def run_game(mode, chromosom=None):
         # The computer player move
         elif mode is AUTO_GAME:
             if Piece_falling:
-                Computer_player.computer_plays(board, falling_piece, chromosom)
+                computer_player.computer_plays(board, falling_piece, chromosom)
                 Piece_falling = False
         elif mode is TRAINING_MODE:
-            Computer_player.computer_plays(board, falling_piece, chromosom)
+            computer_player.computer_plays(board, falling_piece, chromosom)
             moving_down = False
             moving_left = False
             moving_right = False
@@ -380,6 +380,7 @@ def run_game(mode, chromosom=None):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
         ##########################################################################
+    #TODO:
 
     return score
 
