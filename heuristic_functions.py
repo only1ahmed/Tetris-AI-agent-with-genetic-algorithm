@@ -1,5 +1,20 @@
 import numpy as np
 
+'''
+Start with those first:
+aggregate height, 
+complete lines, 
+holes,  
+bumpiness,
+'''
+
+
+
+
+
+
+
+
 # for each hole, count how many blocks are above it and add it to the total that you will return from the function.
 def count_hole_effect(board):
     pass

@@ -2,8 +2,9 @@ import random
 import time
 import pygame
 import sys
+import heuristic_functions
 from pygame.locals import *
-import computer_player #TODO:
+#import computer_player #TODO:
 ##############################################################################
 # SETTING UP GENERAL CONSTANTS
 ##############################################################################
@@ -174,14 +175,14 @@ MANUAL_GAME = 1
 AUTO_GAME = 2
 TRAINING_MODE = 3
 
-
+#TODO:
 ##############################################################################
 # MAIN GAME
 ##############################################################################
 
 
 # The run game function will return score after finishing the game
-def run_game(mode, chromosom=None):
+def run_game(mode, chromosome=None):
     # Setup Pygame board
     global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
     pygame.init()
@@ -308,10 +309,25 @@ def run_game(mode, chromosom=None):
         # The computer player move
         elif mode is AUTO_GAME:
             if Piece_falling:
-                computer_player.computer_plays(board, falling_piece, chromosom)
+                #TODO:
+                
                 Piece_falling = False
         elif mode is TRAINING_MODE:
-            computer_player.computer_plays(board, falling_piece, chromosom)
+            #NOTE: I added this part
+            #Looping through all columns to get the best play
+            optimal_col = -2
+            optimal_rot = 0
+            optimal_score = -10000000
+            for x in range(-2, BOARDWIDTH-2):
+                temp_rotation,temp_score = chromosome.best_play(board, falling_piece, next_piece,x)
+                if temp_score > optimal_score:
+                    optimal_score = temp_score
+                    optimal_col = x
+                    optimal_rot = temp_rotation
+            falling_piece['rotation'] = optimal_rot
+            falling_piece['x'] = optimal_col
+            #computer_player.computer_plays(board, falling_piece, chromosom)
+            #NOTE: end of the note
             moving_down = False
             moving_left = False
             moving_right = False
@@ -658,10 +674,47 @@ def draw_next_piece(piece):
     # draw the "next" piece
     draw_piece(piece, pixelx=WINDOWWIDTH-150, pixely=160)
 
-
 ##############################################################################
 # GAME STATISTICS FUNCTIONS
 ##############################################################################
+def calc_move_data(board, piece, x, r,):
+    #TODO:
+    '''
+    Calculate for now the following
+    aggregate height, 
+    complete lines, 
+    holes,  
+    bumpiness,
+    '''
+    piece['rotation'] = r
+    piece['y'] = 0
+    piece['x'] = x
+
+    # Check if it's a valid position
+    if (not is_valid_position(board, piece)):
+        return [False]
+
+    # Goes down the piece while it's a valid position
+    while is_valid_position(board, piece, adj_X=0, adj_Y=1):
+        piece['y'] += 1
+
+    # Create a hypothetical board
+    new_board = get_blank_board()
+    for x2 in range(BOARDWIDTH):
+        for y in range(BOARDHEIGHT):
+            new_board[x2][y] = board[x2][y]
+
+    # Add the piece to the new_board
+    add_to_board(new_board, piece)
+    
+    # Throw them in heuristic functions based on new_board
+    # Calculate aggregate height
+    # Calculate complete lines
+    # Calculate Number of holes
+    # Calculate Bumpiness
+
+    return [True]
+    
 
 def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef):
     """Calculate informations based on the current play"""
