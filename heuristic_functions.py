@@ -1,5 +1,5 @@
 import numpy as np
-
+import tetris_base as tb
 '''
 Start with those first:
 aggregate height, 
@@ -7,13 +7,68 @@ complete lines,
 holes,  
 bumpiness,
 '''
+BLOCK = 'O'
+BLANK = '.'
+
+def cal_board_heuristics(board):
+    heights = height_each_col(board)
+
+    aggregate_height = sum(heights)
+    complete_lines = complete_lines_effect(board)
+    holes = holes_effect(board)
+    bumpiness = bumpiness_effect(heights)
+
+    return {'aggregate_height': aggregate_height, 'complete_lines': complete_lines, 'holes': holes, 'bumpiness': bumpiness} 
+
+def height_each_col(board):
+    '''
+    Returns a list of the height of each column in the board
+    '''
+    col_heights = []
+    for col in range(tb.BOARDWIDTH):
+        temp_col_h = 0
+        for row in range(tb.BOARDHEIGHT-1,-1,-1):
+            if board[col][row] == BLOCK:
+                temp_col_h = len(board) - row
+        col_heights.append(temp_col_h)
+
+    return col_heights
+
+def complete_lines_effect(board):
+    '''
+    Removes the completed lines and 
+    Returns the number of removed lines
+    '''
+    return tb.remove_complete_lines(board)
+
+def holes_effect(board):
+    '''
+    Returns the number of holes
+    '''
+    holes = 0
+    for col in range(tb.BOARDWIDTH):
+        col_holes = 0
+        for row in range(tb.BOARDHEIGHT-1,-1,-1):
+            if board[col][row] == BLANK:
+                col_holes += 1
+            elif board[col][row] == BLOCK:
+                holes += col_holes
+                col_holes = 0
+            
+    return holes
+
+def bumpiness_effect(heights):
+    '''
+    Returns a measure on how bumpy the surface is
+    '''
+    bumpiness = 0
+    for i in range(len(heights)-1):
+        bumpiness += abs(heights[i] - heights[i+1])
+
+    return bumpiness
 
 
-
-
-
-
-
+#######################################################################
 
 # for each hole, count how many blocks are above it and add it to the total that you will return from the function.
 def count_hole_effect(board):

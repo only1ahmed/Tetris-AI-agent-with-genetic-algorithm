@@ -193,6 +193,8 @@ def run_game(mode, chromosome=None):
     BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
     pygame.display.set_caption('Tetris AI')
 
+    # GENETIC ALGORITHM VARIABLES
+    fitness_score = 0
     # Setup variables
     board = get_blank_board()
     last_movedown_time = time.time()
@@ -223,6 +225,7 @@ def run_game(mode, chromosome=None):
 
             if (not is_valid_position(board, falling_piece)):
                 # GAME-OVER
+                print("GAME OVER: ", score)
                 # Can't fit a new piece on the board, so game over.
                 return
 
@@ -308,34 +311,34 @@ def run_game(mode, chromosome=None):
 
         # The computer player move
         elif mode is AUTO_GAME:
+            # move = chromosome.best_play(board, falling_piece, next_piece)
+            # falling_piece['rotation'] = move['best_rotation']
+            # falling_piece['x'] = move['best_column']
+            # fitness_score = move['score']
+            falling_piece['x'] = 7
+            falling_piece['rotation'] = 0
             if Piece_falling:
                 #TODO:
-                
+                #NOTE: I added this part
+                #########################################################
                 Piece_falling = False
         elif mode is TRAINING_MODE:
             #NOTE: I added this part
-            #Looping through all columns to get the best play
-            optimal_col = -2
-            optimal_rot = 0
-            optimal_score = -10000000
-            for x in range(-2, BOARDWIDTH-2):
-                temp_rotation,temp_score = chromosome.best_play(board, falling_piece, next_piece,x)
-                if temp_score > optimal_score:
-                    optimal_score = temp_score
-                    optimal_col = x
-                    optimal_rot = temp_rotation
-            falling_piece['rotation'] = optimal_rot
-            falling_piece['x'] = optimal_col
-            #computer_player.computer_plays(board, falling_piece, chromosom)
+            # move = chromosome.best_play(board, falling_piece, next_piece)
+            # falling_piece['rotation'] = move['best_rotation']
+            # falling_piece['x'] = move['best_column']
+            # fitness_score = move['score']
             #NOTE: end of the note
+            falling_piece['x'] = 0
+            falling_piece['rotation'] = 0
             moving_down = False
             moving_left = False
             moving_right = False
 
-            for i in range(1, BOARDHEIGHT):
+            for i in range(1,BOARDHEIGHT):
                 if (not is_valid_position(board, falling_piece, adj_Y=i)):
                     break
-
+            
             falling_piece['y'] += i - 1
 
         # Handle moving the piece because of user input
@@ -396,9 +399,7 @@ def run_game(mode, chromosome=None):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
         ##########################################################################
-    #TODO:
-
-    return score
+    return score + fitness_score
 
 ##############################################################################
 # GAME FUNCTIONS
@@ -692,7 +693,7 @@ def calc_move_data(board, piece, x, r,):
 
     # Check if it's a valid position
     if (not is_valid_position(board, piece)):
-        return [False]
+        return {'is_valid':False}
 
     # Goes down the piece while it's a valid position
     while is_valid_position(board, piece, adj_X=0, adj_Y=1):
@@ -708,13 +709,13 @@ def calc_move_data(board, piece, x, r,):
     add_to_board(new_board, piece)
     
     # Throw them in heuristic functions based on new_board
-    # Calculate aggregate height
-    # Calculate complete lines
-    # Calculate Number of holes
-    # Calculate Bumpiness
-
+    board_data = {}
+    cal_data = heuristic_functions.cal_board_heuristics(new_board)
+    board_data['cal_data'] = cal_data
+    board_data['new_board'] = new_board
+    board_data['is_valid'] = True
     # Return new board
-    return [True]
+    return  board_data
     
 
 def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef):
@@ -853,5 +854,3 @@ def calc_sides_in_contact(board, piece):
 
     return piece_sides, floor_sides, wall_sides
 
-
-run_game(MANUAL_GAME)

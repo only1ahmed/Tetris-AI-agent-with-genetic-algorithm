@@ -1,8 +1,9 @@
-import tetris_base
+import tetris_base as tb
 import heuristic_functions
 import random
+import numpy as np
 
-NUM_OF_GENES = 9
+NUM_OF_GENES = 4
 NUM_OF_CHROMOSOMES = 15
 NUM_OF_EVOLUTIONS = 10
 
@@ -10,39 +11,54 @@ PERECENTAGE_OF_MUTATED = 0.2
 PERECENTAGE_OF_SELECTION = 0.1
 
 MAX_SCORE = 10000
-AUTO_GAME = 3
+GAME_MODE = 2
 
 class Chromosome:
-    def __init__(self,genes,tetris_game):
-        self.genes = []
+    def __init__(self,genes=None):
+        self.genes = genes
         self.fitness_score = 0
-        self.tetris_game = tetris_game
         if genes == None:
+            self.genes = []
             for i in range(NUM_OF_GENES):
                 self.genes.append(random.randint(-10, 10))
         else:
             self.genes = genes
     
-    def update_fitness_score(self, heuristics, game_score):
-        self.fitness_score = 0
-        for i in range(NUM_OF_GENES):
-            self.fitness_score += self.genes[i] * heuristics[i]
-        self.fitness_score += game_score
+    def update_fitness_score(self, game_score):
+        self.fitness_score = game_score
     
-    def best_play(self,board,piece,next_piece,column):
+    def best_play(self,board,piece,next_piece):
         best_rotation = 0
+        best_column = -1
         play_score = -10000000
 
-        # TODO: write formula
-        for rot in range(self.tetris_game.PIECES[piece['shape']]):
-            # use calc_move_data 
-            # calculate the score for each rotation and return the best rotation and its score
-            # dot multiplication baby
-            # for the next_piece you could get the new_board from the first piece and recalculate the
-            # calc_move_data based on the next_piece
-            pass
+        for column in range(-2, tb.BOARDWIDTH-2):
+            for rot in range(len(tb.PIECES[piece['shape']])):
+                # use calc_move_data 
+                move_data = tb.calc_move_data(board, piece, column, rot)
 
-        return best_rotation,play_score
+                #if the move is valid
+                if move_data['is_valid']:
+                    # calculate the score for each rotation and return the best rotation and its score
+                    temp_score = np.array(self.genes)
+                    # dot multiplication baby
+                    temp_score = np.dot(temp_score, np.array(list(move_data['cal_data'].values())))
+                    # TODO: TEST IT LATER
+                    # for the next_piece you could get the new_board from the first piece and recalculate the
+                    # calc_move_data based on the next_piece
+                    '''
+                    if(next_piece != None):
+                        for possible_col in range(-2,len(board[0])-2):
+                            best_next_r , next_score = self.best_play(move_data['new_board'],next_piece,None,possible_col)
+                            temp_score += next_score
+                    '''
+                    if temp_score > play_score:
+                        play_score = temp_score
+                        best_rotation = rot
+                        best_column = column
+                
+
+        return {'best_column':best_column,'best_rotation': best_rotation, 'score': play_score}
 
 '''
 Objective function == Heuristic function
@@ -57,19 +73,18 @@ Evolution (Training):
 '''
 class GeneticAlgorithm:
 
-    def __init__(self, num_of_generations,tetris_game):
+    def __init__(self, num_of_generations):
         self.chromosomes = []   # List of Chromosomes
-        self.chromo_scores = [] # Fitness Score for each Chromosome
         self.NUM_OF_GENERATIONS = num_of_generations
         self.optimal_chromosome = None
-        self.tetris_game = tetris_game
+
     
     
     # NOTE: maybe try to take chromosoms as an input (not nessacary)
     def init_chromosomes(self):
         for i in range(NUM_OF_CHROMOSOMES):
             #TODO: Take Input from a file
-            self.chromosomes.append(Chromosome(tetris_game=self.tetris_game))
+            self.chromosomes.append(Chromosome())
 
     def train(self):
     
@@ -82,7 +97,8 @@ class GeneticAlgorithm:
         
         # Return the best chromosome
         #TODO: make sure to return the best chromosome
-        optimal_chromosome = self.chromosomes[0]
+        optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)[0]
+        return optimal_chromosome
 
     '''
     You will be given the
@@ -94,8 +110,8 @@ class GeneticAlgorithm:
         # Run the game for each chromosome and calculate the fitness score
         for chrom in self.chromosomes:
             #TODO:
-            data = self.tetris_game.run_game(AUTO_GAME,chrom)
-            chrom.update_fitness_score(data)
+            chrom_score = tb.run_game(GAME_MODE,chrom)
+            chrom.update_fitness_score(game_score=chrom_score)
 
     def selection(self):
         # Update the chromosome list (delete the rest) ceil(Top 30%)
