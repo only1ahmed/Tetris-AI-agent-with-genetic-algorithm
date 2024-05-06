@@ -45,7 +45,8 @@ class Chromosome:
         return best_rotation,play_score
 
 '''
-Initializes the chromosomes
+Objective function == Heuristic function
+Initializes the chromosomes -> use chromosomes in obj function
 Evolution (Training):
     Fitness for each chromosome(Population) (run_game)
     Selection ceil(Top 30%) 
@@ -92,13 +93,23 @@ class GeneticAlgorithm:
     def cal_fitness(self):
         # Run the game for each chromosome and calculate the fitness score
         for chrom in self.chromosomes:
-            #TODO: 
+            #TODO:
             data = self.tetris_game.run_game(AUTO_GAME,chrom)
             chrom.update_fitness_score(data)
 
-
     def selection(self):
-        # Update the chromosome list (delete the rest) ceil(Top 30%) 
+        # Update the chromosome list (delete the rest) ceil(Top 30%)
+        # Normalize the fitness (1/(1+F_Obj(i)))
+        # Total = Sum(the normalized fitness)
+        # P[i] = F[i] / Total
+        # max(P[i]) => The fittest
+        # ==== Selection ====
+        # use roulette wheel
+        # calculate the cumulative probability
+        # Generate random numbers [0,1]
+        # If random number R[1] is greater than C[1] and smaller than C[2]  then select
+        #   Chromosome[2] as a chromosome in the new population for next generation
+
         pass
 
     def crossover(self):
