@@ -13,12 +13,18 @@ def cal_board_heuristics(board):
 
     heights = height_each_col(board)
     # print('Heights: ',heights)
-    aggregate_height = sum(heights)
-    complete_lines = complete_lines_effect(board)
-    holes = holes_effect(board)
-    bumpiness = bumpiness_effect(heights)
 
-    return {'aggregate_height': aggregate_height, 'complete_lines': complete_lines, 'holes': holes, 'bumpiness': bumpiness} 
+    return {'aggregate_height': sum(heights),
+            'complete_lines': complete_lines_effect(board), 
+            'holes': holes_effect(board), 
+            'bumpiness': bumpiness_effect(heights),
+            'hole_segments': count_hole_segements_effect(board),
+            'height': height_effect(board),
+            'columns': columns_effect(board),
+            'one_rows': one_rows_effect(board),
+            'two_rows': two_rows_effect(board),
+            'three_rows': three_rows_effect(board),
+            'four_rows': four_rows_effect(board)} 
 
 def height_each_col(board):
     '''

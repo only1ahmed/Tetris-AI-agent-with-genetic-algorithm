@@ -4,7 +4,7 @@ import random
 import numpy as np
 import pandas as pd
 
-NUM_OF_GENES = 4
+NUM_OF_GENES = 11
 NUM_OF_CHROMOSOMES = 15
 NUM_OF_EVOLUTIONS = 5
 
@@ -24,7 +24,7 @@ class Chromosome:
         if genes == None:
             self.genes = []
             for i in range(NUM_OF_GENES):
-                self.genes.append(random.randint(-10, 10))
+                self.genes.append(random.uniform(-10,10))
         else:
             self.genes = genes
     

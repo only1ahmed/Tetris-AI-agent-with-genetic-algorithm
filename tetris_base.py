@@ -717,14 +717,7 @@ def draw_next_piece(piece):
 # GAME STATISTICS FUNCTIONS
 ##############################################################################
 def calc_move_data(board, piece, x, r,):
-    #TODO:
-    '''
-    Calculate for now the following
-    aggregate height, 
-    complete lines, 
-    holes,  
-    bumpiness,
-    '''
+    #TODO:    
     piece['rotation'] = r
     piece['y'] = 0
     piece['x'] = x
