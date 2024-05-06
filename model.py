@@ -33,15 +33,14 @@ class Chromosome:
     
     def best_play(self,board,piece,next_piece):
         best_rotation = 0
-        best_column = -1
+        best_column = -2 #
         play_score = -10000000
 
-        #NOTE: HARDCODED VALUES -1 and 7
         for column in range(-2, tb.BOARDWIDTH - 3):
             for rot in range(len(tb.PIECES[piece['shape']])):
                 # use calc_move_data 
                 move_data = tb.calc_move_data(board, piece, column, rot)
-
+                # fitness = w1 * h1(x) + w2* h2(x) ....
                 #if the move is valid
                 if move_data['is_valid']:
                     # calculate the score for each rotation and return the best rotation and its score
@@ -107,7 +106,7 @@ class GeneticAlgorithm:
         
         # Return the best chromosome
         #TODO: make sure to return the best chromosome
-        optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)[0]
+        optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score)[0]
         return optimal_chromosome
 
     '''
@@ -134,6 +133,8 @@ class GeneticAlgorithm:
         off_chroms = []
         num_of_offspring = NUM_OF_CHROMOSOMES - len(self.chromosomes)
         for i in range(len(self.chromosomes)):
+            if(len(off_chroms) >= num_of_offspring):
+                    break
             for j in range(i+1,len(self.chromosomes)):
                 if(len(off_chroms) >= num_of_offspring):
                     break
@@ -156,6 +157,8 @@ class GeneticAlgorithm:
 
     def mutate(self,off_chroms):
         # mutated chromosomes
+        # Set of off chromosomes
+            # eliminate randomly
         num_of_mutated = int(len(off_chroms) * PERECENTAGE_OF_MUTATED)
         for i in range(num_of_mutated):
             rand_chrom = random.choice(off_chroms)

@@ -386,6 +386,8 @@ def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
             falling_piece = next_piece
             next_piece    = get_new_piece()
 
+            # move['score'] = current fitness score (which we calculated by getting the heuristics in best_play)
+
             move = chromosome.best_play(board,falling_piece,next_piece)
             fitness_score += move['score']
             # Reset last_fall_time
