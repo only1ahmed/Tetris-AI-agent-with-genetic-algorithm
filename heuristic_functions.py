@@ -7,12 +7,15 @@ complete lines,
 holes,  
 bumpiness,
 '''
-BLOCK = 'O'
 BLANK = '.'
 
 def cal_board_heuristics(board):
-    heights = height_each_col(board)
+    
+    for col in range(tb.BOARDWIDTH):
+        print(board[col])
 
+    heights = height_each_col(board)
+    print('Heights: ',heights)
     aggregate_height = sum(heights)
     complete_lines = complete_lines_effect(board)
     holes = holes_effect(board)
@@ -27,9 +30,10 @@ def height_each_col(board):
     col_heights = []
     for col in range(tb.BOARDWIDTH):
         temp_col_h = 0
-        for row in range(tb.BOARDHEIGHT-1,-1,-1):
-            if board[col][row] == BLOCK:
-                temp_col_h = len(board) - row
+        for i, cell in enumerate(board[col]):
+            if cell != BLANK:
+                temp_col_h = tb.BOARDHEIGHT - i
+                break
         col_heights.append(temp_col_h)
 
     return col_heights
@@ -51,7 +55,7 @@ def holes_effect(board):
         for row in range(tb.BOARDHEIGHT-1,-1,-1):
             if board[col][row] == BLANK:
                 col_holes += 1
-            elif board[col][row] == BLOCK:
+            elif board[col][row] != BLANK:
                 holes += col_holes
                 col_holes = 0
             

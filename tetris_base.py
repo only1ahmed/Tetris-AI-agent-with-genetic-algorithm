@@ -753,6 +753,7 @@ def calc_move_data(board, piece, x, r,):
     board_data['new_board'] = new_board
     board_data['is_valid'] = True
     # Return new board
+    print("move_data ", board_data)
     return  board_data
 
 def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef):

@@ -35,7 +35,7 @@ class Chromosome:
     def best_play(self,board,piece,next_piece):
         best_rotation = 0
         best_column = -2 #
-        play_score = 0
+        play_score = -100000
 
         for column in range(-2, tb.BOARDWIDTH - 3):
             for rot in range(len(tb.PIECES[piece['shape']])):
@@ -46,8 +46,13 @@ class Chromosome:
                 if move_data['is_valid']:
                     # calculate the score for each rotation and return the best rotation and its score
                     temp_score = np.array(self.genes)
+                    print(temp_score)
                     # dot multiplication baby
                     temp_score = np.dot(temp_score, np.array(list(move_data['cal_data'].values())))
+                    
+                    print("fasdfas ",np.array(list(move_data['cal_data'].values())))
+                    print(temp_score)
+
                     # TODO: TEST IT LATER
                     # for the next_piece you could get the new_board from the first piece and recalculate the
                     # calc_move_data based on the next_piece
