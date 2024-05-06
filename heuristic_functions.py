@@ -40,7 +40,7 @@ def complete_lines_effect(board):
     Removes the completed lines and 
     Returns the number of removed lines
     '''
-    return tb.remove_complete_lines(board)
+    return tb.remove_complete_lines(board) ** 2
 
 def holes_effect(board):
     '''
@@ -54,7 +54,8 @@ def holes_effect(board):
                 col_holes += 1
             elif board[col][row] != BLANK:
                 holes += col_holes
-                col_holes = 0
+                # old holes_effect requires this (DON'T DELETE)
+                # col_holes = 0
             
     return holes
 
@@ -71,14 +72,21 @@ def bumpiness_effect(heights):
 
 #######################################################################
 
-# for each hole, count how many blocks are above it and add it to the total that you will return from the function.
-def count_hole_effect(board):
-    pass
-
-
 # For each column, if there is a hole *segment*, count how many block needs to be cleared for the entire segment to be free (have nothing above it)
 def count_hole_segements_effect(board):
-    pass
+    sum = 0
+    for col in range(tb.BOARDWIDTH):
+        col_segs = 0
+        for row in range(tb.BOARDHEIGHT-1,-1,-1):
+            if board[col][row] == BLANK:
+                col_segs += 1
+                while row >= 0 and board[col][row] == BLANK:
+                    row -= 1
+                row += 1
+            elif board[col][row] != BLANK:
+                sum += col_segs
+                
+    return sum
 
 
 
@@ -91,13 +99,21 @@ def count_hole_segements_effect(board):
 # 
 # max(Max height - 8, 0) so simple, right?
 def height_effect(board):
-    pass
+    maxes = height_each_col(board)
+
+    return max(max(maxes) - 8, 0)
+    
 
 
 
 # empty columns - 1, even more simple!
 def columns_effect(board):
-    pass
+    cnt = 0
+    cols = height_each_col(board)
+    for i in range(len(cols)):
+        if cols[i] == 0:
+            cnt++;
+    return max(0, cnt - 1)
 
 # 
 # NOTE: MAKE SURE TO INCREASE THE REWARD FOR MORE CONSECUTIVE ROWS
@@ -106,19 +122,114 @@ def columns_effect(board):
 
 
 def one_rows_effect(board):
-    pass
+    sum = 0
+    for row in range(tb.BOARDHEIGHT-1,-1,-1):
+        full_col = 0
+        empty_pos = -1
+        for col in range(tb.BOARDWIDTH):
+            if board[col][row] != BLANK:
+                full_col += 1
+            else:
+                empty_pos = col
+        if full_col == tb.BOARDWIDTH - 1:
+            seg_cnt = 0
+            while row >= 0 and board[empty_pos][row] == empty:
+                full_col2 = 0
+                for col in range(tb.BOARDWIDTH):
+                    if board[col][row] != BLANK:
+                        full_col2 += 1
+                if full_col2 == tb.BOARDWIDTH - 1:
+                    seg_cnt++
+                else:
+                    break;
+                row--
+            row++
+            if seg_cnt == 1:
+                sum++
+    return sum * 1
 
 
 # Reward for each *2* consecutive row with 2 column (the same column) only empty.
 def two_rows_effect(board):
-    pass
-
+    sum = 0
+    for row in range(tb.BOARDHEIGHT-1,-1,-1):
+        full_col = 0
+        empty_pos = -1
+        for col in range(tb.BOARDWIDTH):
+            if board[col][row] != BLANK:
+                full_col += 1
+            else:
+                empty_pos = col
+        if full_col == tb.BOARDWIDTH - 1:
+            seg_cnt = 0
+            while row >= 0 and board[empty_pos][row] == empty:
+                full_col2 = 0
+                for col in range(tb.BOARDWIDTH):
+                    if board[col][row] != BLANK:
+                        full_col2 += 1
+                if full_col2 == tb.BOARDWIDTH - 1:
+                    seg_cnt++
+                else:
+                    break;
+                row--
+            row++
+            if seg_cnt == 2:
+                sum++
+    return sum * 2
 
 # Reward for each *3* consecutive row with 3 column (the same column) only empty.
 def three_rows_effect(board):
-    pass
+    sum = 0
+    for row in range(tb.BOARDHEIGHT-1,-1,-1):
+        full_col = 0
+        empty_pos = -1
+        for col in range(tb.BOARDWIDTH):
+            if board[col][row] != BLANK:
+                full_col += 1
+            else:
+                empty_pos = col
+        if full_col == tb.BOARDWIDTH - 1:
+            seg_cnt = 0
+            while row >= 0 and board[empty_pos][row] == empty:
+                full_col2 = 0
+                for col in range(tb.BOARDWIDTH):
+                    if board[col][row] != BLANK:
+                        full_col2 += 1
+                if full_col2 == tb.BOARDWIDTH - 1:
+                    seg_cnt++
+                else:
+                    break;
+                row--
+            row++
+            if seg_cnt == 3:
+                sum++
+    return sum * 3
 
 
 # Reward for each *4* consecutive row with 4 column (the same column) only empty.
 def four_rows_effect(board):
-    pass
+    sum = 0
+    for row in range(tb.BOARDHEIGHT-1,-1,-1):
+        full_col = 0
+        empty_pos = -1
+        for col in range(tb.BOARDWIDTH):
+            if board[col][row] != BLANK:
+                full_col += 1
+            else:
+                empty_pos = col
+        if full_col == tb.BOARDWIDTH - 1:
+            seg_cnt = 0
+            while row >= 0 and board[empty_pos][row] == empty:
+                full_col2 = 0
+                for col in range(tb.BOARDWIDTH):
+                    if board[col][row] != BLANK:
+                        full_col2 += 1
+                if full_col2 == tb.BOARDWIDTH - 1:
+                    seg_cnt++
+                else:
+                    break;
+                row--
+            row++
+            if seg_cnt >= 4:
+                sum++
+    return sum * 4
