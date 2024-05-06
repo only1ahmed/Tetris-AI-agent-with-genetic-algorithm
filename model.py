@@ -157,16 +157,19 @@ class GeneticAlgorithm:
     def mating(self,chrom1,chrom2):
         temp_gene_p1 = chrom1.genes 
         temp_gene_p2 = chrom2.genes
-        gene_len = len(temp_gene_p1)
-        off_gene = []
-        #Multi Point Crossover
-        #TODO: Try another one later
-        for i in range(gene_len):
-            if i % 2 == 0:
-                off_gene.append(temp_gene_p1[i])
-            else:
-                off_gene.append(temp_gene_p2[i])
-        return Chromosome(off_gene)
+        total_fitness = chrom1.fitness_score + chrom2.fitness_score
+        off_gene = np.array(temp_gene_p1)*(chrom1.fitness_score/total_fitness) \
+                  + np.array(temp_gene_p2)*(chrom2.fitness_score/total_fitness)
+        #gene_len = len(temp_gene_p1)
+        #off_gene = []
+        ##Multi Point Crossover
+        ##TODO: Try another one later
+        #for i in range(gene_len):
+        #    if i % 2 == 0:
+        #        off_gene.append(temp_gene_p1[i])
+        #    else:
+        #        off_gene.append(temp_gene_p2[i])
+        return Chromosome(list(off_gene))
 
     def mutate(self,off_chroms):
         # mutated chromosomes
