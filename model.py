@@ -30,7 +30,7 @@ class Chromosome:
     
     def update_fitness_score(self, game_score):
         #Normalize the game score
-        self.fitness_score = game_score
+        self.fitness_score = 1/(1+game_score)
     
     def best_play(self,board,piece,next_piece):
         best_rotation = 0
@@ -98,6 +98,9 @@ class GeneticAlgorithm:
         for i in range(NUM_OF_CHROMOSOMES):
             #TODO: Take Input from a file
             self.chromosomes.append(Chromosome())
+        # for i in range(NUM_OF_CHROMOSOMES):
+        #     #TODO: Take Input from a file
+        #     self.chromosomes.append(Chromosome([-0.510066, 0.760666, -0.35663, -0.184483]))
 
     def train(self):
     
@@ -105,7 +108,7 @@ class GeneticAlgorithm:
             print("Training Generation: [", i,"/ ",self.NUM_OF_GENERATIONS,"]")
             self.cal_fitness()
             self.selection()
-            # print("--Best Score: ",self.chromosomes[0].fitness_score)
+            print("--Best Score: ",self.chromosomes[0].fitness_score)
             HISTORY_GAME_SCORE.append(self.chromosomes[0].fitness_score)
             offspring_chrom = self.crossover()
             offspring_chrom = self.mutate(offspring_chrom)
@@ -117,7 +120,7 @@ class GeneticAlgorithm:
         print("HISTORY GAME SCORE: ",HISTORY_GAME_SCORE)
         
         
-        optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score,reverse=True)[0]
+        optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)[0]
         return optimal_chromosome
 
     '''
@@ -135,7 +138,7 @@ class GeneticAlgorithm:
 
     def selection(self):
         # Update the chromosome list (delete the rest) ceil(Top 30%)
-        self.chromosomes = sorted(self.chromosomes, key=lambda x: x.fitness_score,reverse=True)
+        self.chromosomes = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)
         self.chromosomes = self.chromosomes[int(len(self.chromosomes) * PERECENTAGE_OF_SELECTION):]
 
     def crossover(self): 
