@@ -32,7 +32,8 @@ class Chromosome:
         best_column = -1
         play_score = -10000000
 
-        for column in range(-2, tb.BOARDWIDTH-2):
+        #NOTE: HARDCODED VALUES -1 and 7
+        for column in range(-2, tb.BOARDWIDTH - 3):
             for rot in range(len(tb.PIECES[piece['shape']])):
                 # use calc_move_data 
                 move_data = tb.calc_move_data(board, piece, column, rot)
@@ -57,6 +58,9 @@ class Chromosome:
                         best_rotation = rot
                         best_column = column
                 
+        piece['rotation'] = best_rotation
+        piece['x'] = best_column
+        piece['y'] = 0
 
         return {'best_column':best_column,'best_rotation': best_rotation, 'score': play_score}
 
@@ -110,7 +114,7 @@ class GeneticAlgorithm:
         # Run the game for each chromosome and calculate the fitness score
         for chrom in self.chromosomes:
             #TODO:
-            chrom_score = tb.run_game(GAME_MODE,chrom)
+            chrom_score = tb.run_game_ai(is_training=True,chromosome=chrom,speed=100)
             chrom.update_fitness_score(game_score=chrom_score)
 
     def selection(self):
@@ -141,15 +145,4 @@ class GeneticAlgorithm:
         pass
 
     def save_chromosomes(self):
-        pass
-
-
-class AI:
-    def computer_plays(self, board, piece, chromosom):
-        pass
-
-    def test_all_moves(self, board, piece, chromosom):
-        pass
-
-    def play_move(self, board, rotation, column):
         pass

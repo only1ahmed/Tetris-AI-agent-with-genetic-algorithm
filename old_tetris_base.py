@@ -1,23 +1,20 @@
-import random
-import time
-import pygame
-import sys
+import random, time, pygame, sys
 from pygame.locals import *
-import Computer_player
+
 ##############################################################################
 # SETTING UP GENERAL CONSTANTS
 ##############################################################################
 
 # Board config
-FPS = 25
-WINDOWWIDTH = 650
+FPS          = 25
+WINDOWWIDTH  = 650
 WINDOWHEIGHT = 690
-BOXSIZE = 25
-BOARDWIDTH = 10
-BOARDHEIGHT = 25
-BLANK = '.'
-XMARGIN = int((WINDOWWIDTH - BOARDWIDTH * BOXSIZE) / 2)
-TOPMARGIN = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
+BOXSIZE      = 25
+BOARDWIDTH   = 10
+BOARDHEIGHT  = 25
+BLANK        = '.'
+XMARGIN      = int((WINDOWWIDTH - BOARDWIDTH * BOXSIZE) / 2)
+TOPMARGIN    = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
 
 # Timing config
 # Every time the player pushes the left or right arrow key down, the falling
@@ -27,28 +24,28 @@ TOPMARGIN = WINDOWHEIGHT - (BOARDHEIGHT * BOXSIZE) - 5
 # seconds that passes with the left or right arrow key held down, the piece
 # will move another space over.
 MOVESIDEWAYSFREQ = 0.15
-MOVEDOWNFREQ = 0.1
+MOVEDOWNFREQ     = 0.1
 
 # Colors
 #               R    G    B
-WHITE = (255, 255, 255)
-GRAY = (185, 185, 185)
-BLACK = (0,   0,   0)
-RED = (155,   0,   0)
-LIGHTRED = (175,  20,  20)
-GREEN = (0, 155,   0)
-LIGHTGREEN = (20, 175,  20)
-BLUE = (0,   0, 155)
-LIGHTBLUE = (20,  20, 175)
-YELLOW = (155, 155,   0)
+WHITE       = (255, 255, 255)
+GRAY        = (185, 185, 185)
+BLACK       = (  0,   0,   0)
+RED         = (155,   0,   0)
+LIGHTRED    = (175,  20,  20)
+GREEN       = (  0, 155,   0)
+LIGHTGREEN  = ( 20, 175,  20)
+BLUE        = (  0,   0, 155)
+LIGHTBLUE   = ( 20,  20, 175)
+YELLOW      = (155, 155,   0)
 LIGHTYELLOW = (175, 175,  20)
 
-BORDERCOLOR = BLUE
-BGCOLOR = BLACK
-TEXTCOLOR = WHITE
+BORDERCOLOR     = BLUE
+BGCOLOR         = BLACK
+TEXTCOLOR       = WHITE
 TEXTSHADOWCOLOR = GRAY
-COLORS = (BLUE,      GREEN,      RED,      YELLOW)
-LIGHTCOLORS = (LIGHTBLUE, LIGHTGREEN, LIGHTRED, LIGHTYELLOW)
+COLORS          = (     BLUE,      GREEN,      RED,      YELLOW)
+LIGHTCOLORS     = (LIGHTBLUE, LIGHTGREEN, LIGHTRED, LIGHTYELLOW)
 
 # Each color must have light color
 assert len(COLORS) == len(LIGHTCOLORS)
@@ -56,7 +53,7 @@ assert len(COLORS) == len(LIGHTCOLORS)
 # Piece Templates
 # The TEMPLATEWIDTH and TEMPLATEHEIGHT constants simply set how large each row
 # and column for each shape’s rotation should be
-TEMPLATEWIDTH = 5
+TEMPLATEWIDTH  = 5
 TEMPLATEHEIGHT = 5
 
 S_SHAPE_TEMPLATE = [['.....',
@@ -170,53 +167,47 @@ PIECES = {'S': S_SHAPE_TEMPLATE,
           'T': T_SHAPE_TEMPLATE}
 
 # Define if the game is manual or not
-MANUAL_GAME = 1
-AUTO_GAME = 2
-TRAINING_MODE = 3
-
+MANUAL_GAME = False
 
 ##############################################################################
 # MAIN GAME
 ##############################################################################
-
-
-# The run game function will return score after finishing the game
-def run_game(mode, chromosom=None):
-    # Setup Pygame board
+def main():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
     pygame.init()
 
-    FPSCLOCK = pygame.time.Clock()
+    FPSCLOCK    = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
-    BIGFONT = pygame.font.Font('freesansbold.ttf', 100)
+    BASICFONT   = pygame.font.Font('freesansbold.ttf', 18)
+    BIGFONT     = pygame.font.Font('freesansbold.ttf', 100)
     pygame.display.set_caption('Tetris AI')
 
+    if (MANUAL_GAME):
+        run_game()
+
+def run_game():
     # Setup variables
-    board = get_blank_board()
+    board              = get_blank_board()
     last_movedown_time = time.time()
     last_moveside_time = time.time()
-    last_fall_time = time.time()
-    moving_down = False  # note: there is no movingUp variable
-    moving_left = False
-    moving_right = False
-    score = 0
-    level, fall_freq = calc_level_and_fall_freq(score)
+    last_fall_time     = time.time()
+    moving_down        = False # note: there is no movingUp variable
+    moving_left        = False
+    moving_right       = False
+    score              = 0
+    level, fall_freq   = calc_level_and_fall_freq(score)
 
-    falling_piece = get_new_piece()
-    next_piece = get_new_piece()
-
-    # This variable is used to make sure that the computer player plays the move and wait untill the piece is down
-    Piece_falling = False
+    falling_piece      = get_new_piece()
+    next_piece         = get_new_piece()
 
     while True:
         # Game Loop
         if (falling_piece == None):
             # No falling piece in play, so start a new piece at the top
             falling_piece = next_piece
-            next_piece = get_new_piece()
+            next_piece    = get_new_piece()
             score += 1
-            Piece_falling = True
+
             # Reset last_fall_time
             last_fall_time = time.time()
 
@@ -227,100 +218,79 @@ def run_game(mode, chromosom=None):
 
         # Check for quit
         check_quit()
-        if mode is MANUAL_GAME:
-            for event in pygame.event.get():
-                # Event handling loop
-                if (event.type == KEYUP):
-                    if (event.key == K_p):
-                        # PAUSE the game
-                        DISPLAYSURF.fill(BGCOLOR)
-                        # Pause until a key press
-                        show_text_screen('Paused')
 
-                        # Update times
-                        last_fall_time = time.time()
-                        last_movedown_time = time.time()
-                        last_moveside_time = time.time()
+        for event in pygame.event.get():
+            # Event handling loop
+            if (event.type == KEYUP):
+                if (event.key == K_p):
+                    # PAUSE the game
+                    DISPLAYSURF.fill(BGCOLOR)
+                    # Pause until a key press
+                    show_text_screen('Paused')
 
-                    elif (event.key == K_LEFT or event.key == K_a):
-                        moving_left = False
-                    elif (event.key == K_RIGHT or event.key == K_d):
-                        moving_right = False
-                    elif (event.key == K_DOWN or event.key == K_s):
-                        moving_down = False
+                    # Update times
+                    last_fall_time     = time.time()
+                    last_movedown_time = time.time()
+                    last_moveside_time = time.time()
 
-                elif event.type == KEYDOWN:
-                    # Moving the piece sideways
-                    if (event.key == K_LEFT or event.key == K_a) and \
-                            is_valid_position(board, falling_piece, adj_X=-1):
+                elif (event.key == K_LEFT or event.key == K_a):
+                    moving_left = False
+                elif (event.key == K_RIGHT or event.key == K_d):
+                    moving_right = False
+                elif (event.key == K_DOWN or event.key == K_s):
+                    moving_down = False
 
-                        falling_piece['x'] -= 1
-                        moving_left = True
-                        moving_right = False
-                        last_moveside_time = time.time()
+            elif event.type == KEYDOWN:
+                # Moving the piece sideways
+                if (event.key == K_LEFT or event.key == K_a) and \
+                    is_valid_position(board, falling_piece, adj_X=-1):
 
-                    elif (event.key == K_RIGHT or event.key == K_d) and \
-                            is_valid_position(board, falling_piece, adj_X=1):
+                    falling_piece['x'] -= 1
+                    moving_left         = True
+                    moving_right        = False
+                    last_moveside_time  = time.time()
 
-                        falling_piece['x'] += 1
-                        moving_right = True
-                        moving_left = False
-                        last_moveside_time = time.time()
+                elif (event.key == K_RIGHT or event.key == K_d) and \
+                    is_valid_position(board, falling_piece, adj_X=1):
 
-                    # Rotating the piece (if there is room to rotate)
-                    elif (event.key == K_UP or event.key == K_w):
-                        falling_piece['rotation'] = (
-                            falling_piece['rotation'] + 1) % len(PIECES[falling_piece['shape']])
+                    falling_piece['x'] += 1
+                    moving_right        = True
+                    moving_left         = False
+                    last_moveside_time  = time.time()
 
-                        if (not is_valid_position(board, falling_piece)):
-                            falling_piece['rotation'] = (
-                                falling_piece['rotation'] - 1) % len(PIECES[falling_piece['shape']])
+                # Rotating the piece (if there is room to rotate)
+                elif (event.key == K_UP or event.key == K_w):
+                    falling_piece['rotation'] = (falling_piece['rotation'] + 1) % len(PIECES[falling_piece['shape']])
 
-                    elif (event.key == K_q):
-                        falling_piece['rotation'] = (
-                            falling_piece['rotation'] - 1) % len(PIECES[falling_piece['shape']])
+                    if (not is_valid_position(board, falling_piece)):
+                        falling_piece['rotation'] = (falling_piece['rotation'] - 1) % len(PIECES[falling_piece['shape']])
 
-                        if (not is_valid_position(board, falling_piece)):
-                            falling_piece['rotation'] = (
-                                falling_piece['rotation'] + 1) % len(PIECES[falling_piece['shape']])
+                elif (event.key == K_q):
+                    falling_piece['rotation'] = (falling_piece['rotation'] - 1) % len(PIECES[falling_piece['shape']])
 
-                    # Making the piece fall faster with the down key
-                    elif (event.key == K_DOWN or event.key == K_s):
-                        moving_down = True
+                    if (not is_valid_position(board, falling_piece)):
+                        falling_piece['rotation'] = (falling_piece['rotation'] + 1) % len(PIECES[falling_piece['shape']])
 
-                        if (is_valid_position(board, falling_piece, adj_Y=1)):
-                            falling_piece['y'] += 1
+                # Making the piece fall faster with the down key
+                elif (event.key == K_DOWN or event.key == K_s):
+                    moving_down = True
 
-                        last_movedown_time = time.time()
+                    if (is_valid_position(board, falling_piece, adj_Y=1)):
+                        falling_piece['y'] += 1
 
-                    # Move the current piece all the way down
-                    elif event.key == K_SPACE:
-                        moving_down = False
-                        moving_left = False
-                        moving_right = False
+                    last_movedown_time = time.time()
 
-                        for i in range(1, BOARDHEIGHT):
-                            if (not is_valid_position(board, falling_piece, adj_Y=i)):
-                                break
+                # Move the current piece all the way down
+                elif event.key == K_SPACE:
+                    moving_down  = False
+                    moving_left  = False
+                    moving_right = False
 
-                        falling_piece['y'] += i - 1
+                    for i in range(1, BOARDHEIGHT):
+                        if (not is_valid_position(board, falling_piece, adj_Y=i)):
+                            break
 
-        # The computer player move
-        elif mode is AUTO_GAME:
-            if Piece_falling:
-                Computer_player.computer_plays(board, falling_piece, chromosom)
-                Piece_falling = False
-        elif mode is TRAINING_MODE:
-            Computer_player.computer_plays(board, falling_piece, chromosom)
-            moving_down = False
-            moving_left = False
-            moving_right = False
-
-            for i in range(1, BOARDHEIGHT):
-                if (not is_valid_position(board, falling_piece, adj_Y=i)):
-                    break
-
-            falling_piece['y'] += i - 1
+                    falling_piece['y'] += i - 1
 
         # Handle moving the piece because of user input
         if (moving_left or moving_right) and time.time() - last_moveside_time > MOVESIDEWAYSFREQ:
@@ -349,7 +319,7 @@ def run_game(mode, chromosom=None):
                 # 300  pts for 3 lines
                 # 1200 pts for 4 lines
 
-                if (num_removed_lines == 1):
+                if(num_removed_lines == 1):
                     score += 40
                 elif (num_removed_lines == 2):
                     score += 120
@@ -359,34 +329,34 @@ def run_game(mode, chromosom=None):
                     score += 1200
 
                 level, fall_freq = calc_level_and_fall_freq(score)
-                falling_piece = None
+                falling_piece    = None
 
             else:
                 # Piece did not land, just move the piece down
                 falling_piece['y'] += 1
-                last_fall_time = time.time()
+                last_fall_time      = time.time()
 
         # Drawing everything on the screen
-        # NOTE: put a if statment to check if the game mode is training mode, for less time consumption (don't include what is below the line of #s)
         DISPLAYSURF.fill(BGCOLOR)
         draw_board(board)
         draw_status(score, level)
         draw_next_piece(next_piece)
-        ##########################################################################
+
         if falling_piece != None:
             draw_piece(falling_piece)
 
-        # NOTE: put a if statment to check if the game mode is training mode, for less time consumption
         pygame.display.update()
         FPSCLOCK.tick(FPS)
-        ##########################################################################
 
-    return score
-
+def run_game_ai():
+    # move = chromosome.best_play(board, falling_piece, next_piece)
+            # falling_piece['rotation'] = move['best_rotation']
+            # falling_piece['x'] = move['best_column']
+            # fitness_score = move['score']
+    pass
 ##############################################################################
 # GAME FUNCTIONS
 ##############################################################################
-
 
 def make_text_objs(text, font, color):
     surf = font.render(text, True, color)
@@ -418,17 +388,16 @@ def show_text_screen(text):
 
     # Draw the text drop shadow
     title_surf, title_rect = make_text_objs(text, BIGFONT, TEXTSHADOWCOLOR)
-    title_rect.center = (int(WINDOWWIDTH / 2), int(WINDOWHEIGHT / 2))
+    title_rect.center      = (int(WINDOWWIDTH / 2), int(WINDOWHEIGHT / 2))
     DISPLAYSURF.blit(title_surf, title_rect)
 
     # Draw the text
     title_surf, title_rect = make_text_objs(text, BIGFONT, TEXTCOLOR)
-    title_rect.center = (int(WINDOWWIDTH / 2) - 3, int(WINDOWHEIGHT / 2) - 3)
+    title_rect.center      = (int(WINDOWWIDTH / 2) - 3, int(WINDOWHEIGHT / 2) - 3)
     DISPLAYSURF.blit(title_surf, title_rect)
 
     # Draw the additional "Press a key to play." text.
-    press_key_surf, press_key_rect = make_text_objs(
-        'Press a key to play.', BASICFONT, TEXTCOLOR)
+    press_key_surf, press_key_rect = make_text_objs('Press a key to play.', BASICFONT, TEXTCOLOR)
     press_key_rect.center = (int(WINDOWWIDTH / 2), int(WINDOWHEIGHT / 2) + 100)
     DISPLAYSURF.blit(press_key_surf, press_key_rect)
 
@@ -438,13 +407,13 @@ def show_text_screen(text):
 
 
 def check_quit():
-    for event in pygame.event.get(QUIT):  # get all the QUIT events
-        terminate()  # terminate if any QUIT events are present
+    for event in pygame.event.get(QUIT): # get all the QUIT events
+        terminate() # terminate if any QUIT events are present
 
-    for event in pygame.event.get(KEYUP):  # get all the KEYUP events
+    for event in pygame.event.get(KEYUP): # get all the KEYUP events
         if event.key == K_ESCAPE:
-            terminate()  # terminate if the KEYUP event was for the Esc key
-        pygame.event.post(event)  # put the other KEYUP event objects back
+            terminate() # terminate if the KEYUP event was for the Esc key
+        pygame.event.post(event) # put the other KEYUP event objects back
 
 
 def calc_level_and_fall_freq(score):
@@ -456,11 +425,11 @@ def calc_level_and_fall_freq(score):
         score: game score
 
     """
-    level = int(score / 400) + 1
+    level     = int(score / 400) + 1
     fall_freq = 0.27 - (level * 0.02)
 
-    # if (not MANUAL_GAME):
-    # fall_freq = 0.00
+    if (not MANUAL_GAME):
+        fall_freq = 0.00
 
     return level, fall_freq
 
@@ -468,12 +437,12 @@ def calc_level_and_fall_freq(score):
 def get_new_piece():
     """Return a random new piece in a random rotation and color"""
 
-    shape = random.choice(list(PIECES.keys()))
+    shape     = random.choice(list(PIECES.keys()))
     new_piece = {'shape': shape,
-                 'rotation': random.randint(0, len(PIECES[shape]) - 1),
-                 'x': int(BOARDWIDTH / 2) - int(TEMPLATEWIDTH / 2),
-                 'y': -2,  # start it above the board (i.e. less than 0)
-                 'color': random.randint(0, len(COLORS)-1)}
+                'rotation': random.randint(0, len(PIECES[shape]) - 1),
+                'x': int(BOARDWIDTH / 2) - int(TEMPLATEWIDTH / 2),
+                'y': -2, # start it above the board (i.e. less than 0)
+                'color': random.randint(0, len(COLORS)-1)}
 
     return new_piece
 
@@ -588,22 +557,18 @@ def draw_box(boxx, boxy, color, pixelx=None, pixely=None):
     if pixelx == None and pixely == None:
         pixelx, pixely = conv_to_pixels_coords(boxx, boxy)
 
-    pygame.draw.rect(
-        DISPLAYSURF, COLORS[color], (pixelx + 1, pixely + 1, BOXSIZE - 1, BOXSIZE - 1))
-    pygame.draw.rect(
-        DISPLAYSURF, LIGHTCOLORS[color], (pixelx + 1, pixely + 1, BOXSIZE - 4, BOXSIZE - 4))
+    pygame.draw.rect(DISPLAYSURF, COLORS[color], (pixelx + 1, pixely + 1, BOXSIZE - 1, BOXSIZE - 1))
+    pygame.draw.rect(DISPLAYSURF, LIGHTCOLORS[color], (pixelx + 1, pixely + 1, BOXSIZE - 4, BOXSIZE - 4))
 
 
 def draw_board(board):
     """Draw board"""
 
     # Draw the border around the board
-    pygame.draw.rect(DISPLAYSURF, BORDERCOLOR, (XMARGIN - 3, TOPMARGIN - 7,
-                     (BOARDWIDTH * BOXSIZE) + 8, (BOARDHEIGHT * BOXSIZE) + 8), 5)
+    pygame.draw.rect(DISPLAYSURF, BORDERCOLOR, (XMARGIN - 3, TOPMARGIN - 7, (BOARDWIDTH * BOXSIZE) + 8, (BOARDHEIGHT * BOXSIZE) + 8), 5)
 
     # Fill the background of the board
-    pygame.draw.rect(DISPLAYSURF, BGCOLOR, (XMARGIN, TOPMARGIN,
-                     BOXSIZE * BOARDWIDTH, BOXSIZE * BOARDHEIGHT))
+    pygame.draw.rect(DISPLAYSURF, BGCOLOR, (XMARGIN, TOPMARGIN, BOXSIZE * BOARDWIDTH, BOXSIZE * BOARDHEIGHT))
 
     # Draw the individual boxes on the board
     for x in range(BOARDWIDTH):
@@ -641,8 +606,7 @@ def draw_piece(piece, pixelx=None, pixely=None):
     for x in range(TEMPLATEWIDTH):
         for y in range(TEMPLATEHEIGHT):
             if shape_to_draw[y][x] != BLANK:
-                draw_box(None, None, piece['color'], pixelx +
-                         (x * BOXSIZE), pixely + (y * BOXSIZE))
+                draw_box(None, None, piece['color'], pixelx + (x * BOXSIZE), pixely + (y * BOXSIZE))
 
 
 def draw_next_piece(piece):
@@ -661,13 +625,51 @@ def draw_next_piece(piece):
 ##############################################################################
 # GAME STATISTICS FUNCTIONS
 ##############################################################################
+def calc_move_data(board, piece, x, r,):
+    #TODO:
+    '''
+    Calculate for now the following
+    aggregate height, 
+    complete lines, 
+    holes,  
+    bumpiness,
+    '''
+    piece['rotation'] = r
+    piece['y'] = 0
+    piece['x'] = x
+
+    # Check if it's a valid position
+    if (not is_valid_position(board, piece)):
+        return {'is_valid':False}
+
+    # Goes down the piece while it's a valid position
+    while is_valid_position(board, piece, adj_X=0, adj_Y=1):
+        piece['y'] += 1
+
+    # Create a hypothetical board
+    new_board = get_blank_board()
+    for x2 in range(BOARDWIDTH):
+        for y in range(BOARDHEIGHT):
+            new_board[x2][y] = board[x2][y]
+
+    # Add the piece to the new_board
+    add_to_board(new_board, piece)
+    
+    # Throw them in heuristic functions based on new_board
+    board_data = {}
+    cal_data = heuristic_functions.cal_board_heuristics(new_board)
+    board_data['cal_data'] = cal_data
+    board_data['new_board'] = new_board
+    board_data['is_valid'] = True
+    # Return new board
+    return  board_data
 
 def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef):
     """Calculate informations based on the current play"""
 
     piece['rotation'] = r
-    piece['y'] = 0
-    piece['x'] = x
+    piece['y']        = 0
+    piece['x']        = x
 
     # Check if it's a valid position
     if (not is_valid_position(board, piece)):
@@ -675,7 +677,7 @@ def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef
 
     # Goes down the piece while it's a valid position
     while is_valid_position(board, piece, adj_X=0, adj_Y=1):
-        piece['y'] += 1
+        piece['y']+=1
 
     # Create a hypothetical board
     new_board = get_blank_board()
@@ -693,8 +695,8 @@ def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef
     num_removed_lines = remove_complete_lines(new_board)
 
     total_blocking_block = 0
-    total_holes = 0
-    max_height = 0
+    total_holes          = 0
+    max_height           = 0
 
     for x2 in range(0, BOARDWIDTH):
         b = calc_heuristics(new_board, x2)
@@ -702,24 +704,22 @@ def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef
         total_blocking_block += b[1]
         max_height += b[2]
 
-    new_holes = total_holes - total_holes_bef
+    new_holes           = total_holes - total_holes_bef
     new_blocking_blocks = total_blocking_block - total_blocking_bloks_bef
 
     return [True, max_height, num_removed_lines, new_holes, new_blocking_blocks, piece_sides, floor_sides, wall_sides]
 
-
 def calc_initial_move_info(board):
-    total_holes = 0
+    total_holes          = 0
     total_blocking_bocks = 0
 
     for x2 in range(0, BOARDWIDTH):
         b = calc_heuristics(board, x2)
 
-        total_holes += b[0]
+        total_holes          += b[0]
         total_blocking_bocks += b[1]
 
     return total_holes, total_blocking_bocks
-
 
 def calc_heuristics(board, x):
     """Calculate heuristics
@@ -728,13 +728,13 @@ def calc_heuristics(board, x):
     hole and maximum height.
 
     """
-    total_holes = 0
-    locals_holes = 0
+    total_holes        = 0
+    locals_holes       = 0
     blocks_above_holes = 0
-    is_hole_exist = False
-    sum_heights = 0
+    is_hole_exist      = False
+    sum_heights        = 0
 
-    for y in range(BOARDHEIGHT-1, -1, -1):
+    for y in range(BOARDHEIGHT-1, -1,-1):
         if board[x][y] == BLANK:
             locals_holes += 1
         else:
@@ -749,40 +749,37 @@ def calc_heuristics(board, x):
 
     return total_holes, blocks_above_holes, sum_heights
 
-
 def calc_sides_in_contact(board, piece):
     """Calculate sides in contacts"""
 
     piece_sides = 0
     floor_sides = 0
-    wall_sides = 0
+    wall_sides  = 0
 
     for Px in range(TEMPLATEWIDTH):
         for Py in range(TEMPLATEHEIGHT):
 
             # Wall
-            # Quadrante faz parte da peça
-            if not PIECES[piece['shape']][piece['rotation']][Py][Px] == BLANK:
+            if not PIECES[piece['shape']][piece['rotation']][Py][Px] == BLANK: # Quadrante faz parte da peça
                 if piece['x']+Px == 0 or piece['x']+Px == BOARDWIDTH-1:
                     wall_sides += 1
 
                 if piece['y']+Py == BOARDHEIGHT-1:
                     floor_sides += 1
                 else:
-                    # Para outras opecas no contorno do template:
+                # Para outras opecas no contorno do template:
                     if Py == TEMPLATEHEIGHT-1 and not board[piece['x']+Px][piece['y']+Py+1] == BLANK:
                         piece_sides += 1
 
-                # os extremos do template sao colorido: confere se ha pecas do lado deles
+                #os extremos do template sao colorido: confere se ha pecas do lado deles
                 if Px == 0 and piece['x']+Px > 0 and not board[piece['x']+Px-1][piece['y']+Py] == BLANK:
-                    piece_sides += 1
+                        piece_sides += 1
 
-                if Px == TEMPLATEWIDTH-1 and piece['x']+Px < BOARDWIDTH - 1 and not board[piece['x']+Px+1][piece['y']+Py] == BLANK:
-                    piece_sides += 1
+                if Px == TEMPLATEWIDTH-1 and piece['x']+Px < BOARDWIDTH -1 and not board[piece['x']+Px+1][piece['y']+Py] == BLANK:
+                        piece_sides += 1
 
             # Other pieces in general
-            # quadrante do tabuleiro colorido mas nao do template
-            elif piece['x']+Px < BOARDWIDTH and piece['x']+Px >= 0 and piece['y']+Py < BOARDHEIGHT and not board[piece['x']+Px][piece['y']+Py] == BLANK:
+            elif piece['x']+Px < BOARDWIDTH and piece['x']+Px >= 0 and piece['y']+Py < BOARDHEIGHT and not board[piece['x']+Px][piece['y']+Py] == BLANK:  #quadrante do tabuleiro colorido mas nao do template
 
                 # O quadrante vazio do template esta colorido no tabuleiro
                 if not PIECES[piece['shape']][piece['rotation']][Py-1][Px] == BLANK:
@@ -794,9 +791,6 @@ def calc_sides_in_contact(board, piece):
                 if Px < TEMPLATEWIDTH-1 and not PIECES[piece['shape']][piece['rotation']][Py][Px+1] == BLANK:
                     piece_sides += 1
 
-                    # (nao pode haver pecas em cima)
+                    #(nao pode haver pecas em cima)
 
-    return piece_sides, floor_sides, wall_sides
-
-
-run_game(MANUAL_GAME)
+    return  piece_sides, floor_sides, wall_sides
