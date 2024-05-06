@@ -366,6 +366,7 @@ def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
     board              = get_blank_board()
     last_fall_time     = time.time()
     score              = 0
+    fitness_score      = 0
     level, fall_freq   = calc_level_and_fall_freq(score)
 
     falling_piece      = get_new_piece()
@@ -385,8 +386,8 @@ def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
             falling_piece = next_piece
             next_piece    = get_new_piece()
 
-            chromosome.best_play(board,falling_piece,next_piece)
-
+            move = chromosome.best_play(board,falling_piece,next_piece)
+            fitness_score += move['score']
             # Reset last_fall_time
             last_fall_time = time.time()
 
@@ -441,7 +442,8 @@ def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
         # DRAWING THE BOARD
-    pass
+
+    return score + fitness_score
 ##############################################################################
 # GAME FUNCTIONS
 ##############################################################################

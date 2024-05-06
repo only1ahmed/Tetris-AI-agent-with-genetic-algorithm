@@ -2,13 +2,14 @@ import tetris_base as tb
 import heuristic_functions
 import random
 import numpy as np
+import pandas as pd
 
 NUM_OF_GENES = 4
 NUM_OF_CHROMOSOMES = 15
 NUM_OF_EVOLUTIONS = 10
 
 PERECENTAGE_OF_MUTATED = 0.2
-PERECENTAGE_OF_SELECTION = 0.1
+PERECENTAGE_OF_SELECTION = 0.3
 
 MAX_SCORE = 10000
 GAME_MODE = 2
@@ -17,6 +18,7 @@ class Chromosome:
     def __init__(self,genes=None):
         self.genes = genes
         self.fitness_score = 0
+
         if genes == None:
             self.genes = []
             for i in range(NUM_OF_GENES):
@@ -25,7 +27,9 @@ class Chromosome:
             self.genes = genes
     
     def update_fitness_score(self, game_score):
-        self.fitness_score = game_score
+        #Normalize the game score
+        print("Game Score: ",game_score)
+        self.fitness_score = 1 / (1 + game_score)
     
     def best_play(self,board,piece,next_piece):
         best_rotation = 0
@@ -93,8 +97,10 @@ class GeneticAlgorithm:
     def train(self):
     
         for i in range(self.NUM_OF_GENERATIONS):
+            print("Training Generation: ", i,)
             self.cal_fitness()
             self.selection()
+            print("--Best Score: ",self.chromosomes[0].fitness_score)
             offspring_chrom = self.crossover()
             offspring_chrom = self.mutate(offspring_chrom)
             self.replace(offspring_chrom)
@@ -115,34 +121,53 @@ class GeneticAlgorithm:
         for chrom in self.chromosomes:
             #TODO:
             chrom_score = tb.run_game_ai(is_training=True,chromosome=chrom,speed=100)
+            print("Chromosome Score: ",chrom_score)
             chrom.update_fitness_score(game_score=chrom_score)
 
     def selection(self):
         # Update the chromosome list (delete the rest) ceil(Top 30%)
-        # Normalize the fitness (1/(1+F_Obj(i)))
-        # Total = Sum(the normalized fitness)
-        # P[i] = F[i] / Total
-        # max(P[i]) => The fittest
-        # ==== Selection ====
-        # use roulette wheel
-        # calculate the cumulative probability
-        # Generate random numbers [0,1]
-        # If random number R[1] is greater than C[1] and smaller than C[2]  then select
-        #   Chromosome[2] as a chromosome in the new population for next generation
+        self.chromosomes = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)
+        self.chromosomes = self.chromosomes[int(len(self.chromosomes) * PERECENTAGE_OF_SELECTION):]
 
-        pass
-
-    def crossover(self):
-        # 1 2 3 4 = 6 off (4 C 2) 
+    def crossover(self): 
         # Return new chromosomes
-        pass
+        off_chroms = []
+        num_of_offspring = NUM_OF_CHROMOSOMES - len(self.chromosomes)
+        for i in range(len(self.chromosomes)):
+            for j in range(i+1,len(self.chromosomes)):
+                if(len(off_chroms) >= num_of_offspring):
+                    break
+                off_chroms.append(self.mating(self.chromosomes[i],self.chromosomes[j]))
+        return off_chroms
+    
+    def mating(self,chrom1,chrom2):
+        temp_gene_p1 = chrom1.genes 
+        temp_gene_p2 = chrom2.genes
+        gene_len = len(temp_gene_p1)
+        off_gene = []
+        #Multi Point Crossover
+        #TODO: Try another one later
+        for i in range(gene_len):
+            if i % 2 == 0:
+                off_gene.append(temp_gene_p1[i])
+            else:
+                off_gene.append(temp_gene_p2[i])
+        return Chromosome(off_gene)
 
     def mutate(self,off_chroms):
         # mutated chromosomes
-        pass
+        num_of_mutated = int(len(off_chroms) * PERECENTAGE_OF_MUTATED)
+        for i in range(num_of_mutated):
+            rand_chrom = random.choice(off_chroms)
+            rand_gene = random.randint(0,len(rand_chrom.genes)-1)
+            rand_chrom.genes[rand_gene] += random.uniform(-0.1,0.1)         
+        return off_chroms
     
     def replace(self,off_chroms):
-        pass
+        # Replace the 
+        print(off_chroms)
+        self.chromosomes = self.chromosomes + off_chroms
 
     def save_chromosomes(self):
+        # Save the chromosomes to a file
         pass
