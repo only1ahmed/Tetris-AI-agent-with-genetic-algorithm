@@ -389,7 +389,7 @@ def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
             # move['score'] = current fitness score (which we calculated by getting the heuristics in best_play)
 
             move = chromosome.best_play(board,falling_piece,next_piece)
-            fitness_score += move['score']
+            # fitness_score += move['score']
             # Reset last_fall_time
             last_fall_time = time.time()
 
@@ -753,7 +753,7 @@ def calc_move_data(board, piece, x, r,):
     board_data['new_board'] = new_board
     board_data['is_valid'] = True
     # Return new board
-    print("move_data ", board_data)
+    # print("move_data ", board_data)
     return  board_data
 
 def calc_move_info(board, piece, x, r, total_holes_bef, total_blocking_bloks_bef):

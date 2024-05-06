@@ -10,12 +10,9 @@ bumpiness,
 BLANK = '.'
 
 def cal_board_heuristics(board):
-    
-    for col in range(tb.BOARDWIDTH):
-        print(board[col])
 
     heights = height_each_col(board)
-    print('Heights: ',heights)
+    # print('Heights: ',heights)
     aggregate_height = sum(heights)
     complete_lines = complete_lines_effect(board)
     holes = holes_effect(board)

@@ -6,13 +6,15 @@ import pandas as pd
 
 NUM_OF_GENES = 4
 NUM_OF_CHROMOSOMES = 15
-NUM_OF_EVOLUTIONS = 10
+NUM_OF_EVOLUTIONS = 5
 
 PERECENTAGE_OF_MUTATED = 0.2
 PERECENTAGE_OF_SELECTION = 0.3
 
 MAX_SCORE = 10000
 GAME_MODE = 2
+
+HISTORY_GAME_SCORE = []
 
 class Chromosome:
     def __init__(self,genes=None):
@@ -28,8 +30,6 @@ class Chromosome:
     
     def update_fitness_score(self, game_score):
         #Normalize the game score
-        print(self.genes)
-        print("Game Score: ",game_score)
         self.fitness_score = 1 / (1 + game_score)
     
     def best_play(self,board,piece,next_piece):
@@ -46,12 +46,12 @@ class Chromosome:
                 if move_data['is_valid']:
                     # calculate the score for each rotation and return the best rotation and its score
                     temp_score = np.array(self.genes)
-                    print(temp_score)
+                    # print("Chromosome Genes: ",self.genes)
                     # dot multiplication baby
                     temp_score = np.dot(temp_score, np.array(list(move_data['cal_data'].values())))
                     
-                    print("fasdfas ",np.array(list(move_data['cal_data'].values())))
-                    print(temp_score)
+                    # print("H(x) ",np.array(list(move_data['cal_data'].values())))
+                    # print("Score: ",temp_score)
 
                     # TODO: TEST IT LATER
                     # for the next_piece you could get the new_board from the first piece and recalculate the
@@ -102,16 +102,21 @@ class GeneticAlgorithm:
     def train(self):
     
         for i in range(self.NUM_OF_GENERATIONS):
-            print("Training Generation: ", i,)
+            print("Training Generation: [", i,"/ ",self.NUM_OF_GENERATIONS,"]")
             self.cal_fitness()
             self.selection()
-            print("--Best Score: ",self.chromosomes[0].fitness_score)
+            # print("--Best Score: ",self.chromosomes[0].fitness_score)
+            HISTORY_GAME_SCORE.append(self.chromosomes[0].fitness_score)
             offspring_chrom = self.crossover()
             offspring_chrom = self.mutate(offspring_chrom)
             self.replace(offspring_chrom)
         
         # Return the best chromosome
         #TODO: make sure to return the best chromosome
+        # Save the HISTORY GAME SCORE to a file
+        print("HISTORY GAME SCORE: ",HISTORY_GAME_SCORE)
+        
+        
         optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score)[0]
         return optimal_chromosome
 
@@ -126,7 +131,6 @@ class GeneticAlgorithm:
         for chrom in self.chromosomes:
             #TODO:
             chrom_score = tb.run_game_ai(is_training=True,chromosome=chrom,speed=100)
-            print("Chromosome Score: ",chrom_score)
             chrom.update_fitness_score(game_score=chrom_score)
 
     def selection(self):
@@ -174,7 +178,6 @@ class GeneticAlgorithm:
     
     def replace(self,off_chroms):
         # Replace the 
-        print(off_chroms)
         self.chromosomes = self.chromosomes + off_chroms
 
     def save_chromosomes(self):
