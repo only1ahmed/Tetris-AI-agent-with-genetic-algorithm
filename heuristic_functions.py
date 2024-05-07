@@ -12,20 +12,6 @@ BLANK = '.'
 def cal_board_heuristics(board):
 
     heights = height_each_col(board)
-    # print('Heights: ',heights)
-
-# return {'aggregate_height': sum(heights),
-#             'complete_lines': complete_lines_effect(board), 
-#             'holes': holes_effect(board), 
-#             'bumpiness': bumpiness_effect(heights),
-#             'hole_segments': count_hole_segements_effect(board),
-#             'height': height_effect(board),
-#             'columns': columns_effect(board),
-#             'one_rows': one_rows_effect(board),
-#             'two_rows': two_rows_effect(board),
-#             'three_rows': three_rows_effect(board),
-#             'four_rows': four_rows_effect(board)} 
-
 
     # return {'aggregate_height': sum(heights),
     #         'complete_lines': complete_lines_effect(board), 
@@ -48,7 +34,8 @@ def cal_board_heuristics(board):
             'one_rows': 0,
             'two_rows': 0,
             'three_rows': 0,
-            'four_rows': 0} 
+            'four_rows': 0}
+ 
 def height_each_col(board):
     '''
     Returns a list of the height of each column in the board
@@ -117,24 +104,13 @@ def count_hole_segements_effect(board):
                 
     return sum
 
-
-
-# How many rows are cleared in the move
-# give some n*X points in case of n row cleared (choose X, but don't choose is negative nor too big)
-# def rows_cleared_effect(current_board, previous_board):
-#     pass
-
-
-# 
+ 
 # max(Max height - 8, 0) so simple, right?
 def height_effect(board):
     maxes = height_each_col(board)
 
     return max(max(maxes) - 8, 0) ** 2
     
-
-
-
 # empty columns - 1, even more simple!
 def columns_effect(board):
     cnt = 0
@@ -144,12 +120,7 @@ def columns_effect(board):
             cnt+=1
     return max(0, cnt - 1)
 
-# 
-# NOTE: MAKE SURE TO INCREASE THE REWARD FOR MORE CONSECUTIVE ROWS
-
 # Reward for each *1* consecutive row with 1 column (the same column) only empty.
-
-
 def one_rows_effect(board):
     sum = 0
     for row in range(tb.BOARDHEIGHT-1,-1,-1):
