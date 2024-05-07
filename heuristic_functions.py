@@ -14,17 +14,30 @@ def cal_board_heuristics(board):
     heights = height_each_col(board)
     # print('Heights: ',heights)
 
+# return {'aggregate_height': sum(heights),
+#             'complete_lines': complete_lines_effect(board), 
+#             'holes': holes_effect(board), 
+#             'bumpiness': bumpiness_effect(heights),
+#             'hole_segments': count_hole_segements_effect(board),
+#             'height': height_effect(board),
+#             'columns': columns_effect(board),
+#             'one_rows': one_rows_effect(board),
+#             'two_rows': two_rows_effect(board),
+#             'three_rows': three_rows_effect(board),
+#             'four_rows': four_rows_effect(board)} 
+
+
     return {'aggregate_height': sum(heights),
             'complete_lines': complete_lines_effect(board), 
             'holes': holes_effect(board), 
             'bumpiness': bumpiness_effect(heights),
-            'hole_segments': count_hole_segements_effect(board),
-            'height': height_effect(board),
-            'columns': columns_effect(board),
-            'one_rows': one_rows_effect(board),
-            'two_rows': two_rows_effect(board),
-            'three_rows': three_rows_effect(board),
-            'four_rows': four_rows_effect(board)} 
+            'hole_segments': 0,
+            'height': 0,
+            'columns': 0,
+            'one_rows': 0,
+            'two_rows': 0,
+            'three_rows': 0,
+            'four_rows': 0} 
 
 def height_each_col(board):
     '''
@@ -61,9 +74,9 @@ def holes_effect(board):
             elif board[col][row] != BLANK:
                 holes += col_holes
                 # old holes_effect requires this (DON'T DELETE)
-                # col_holes = 0
+                col_holes = 0
             
-    return holes
+    return holes**2
 
 def bumpiness_effect(heights):
     '''
