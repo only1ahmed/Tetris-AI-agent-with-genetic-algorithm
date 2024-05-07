@@ -24,7 +24,7 @@ class Chromosome:
         if genes == None:
             self.genes = []
             for i in range(NUM_OF_GENES):
-                self.genes.append(random.uniform(-10,10))
+                self.genes.append(random.uniform(-10.0,10.0))
         else:
             self.genes = genes
     
@@ -179,7 +179,7 @@ class GeneticAlgorithm:
         num_of_mutated = int(len(off_chroms) * PERECENTAGE_OF_MUTATED)
         for i in range(num_of_mutated):
             rand_chrom = random.choice(off_chroms)
-            rand_gene = random.randint(0,len(rand_chrom.genes)-1)
+            rand_gene = random.uniform(0.0,float(len(rand_chrom.genes)-1))
             rand_chrom.genes[rand_gene] += random.uniform(-0.1,0.1)         
         return off_chroms
     

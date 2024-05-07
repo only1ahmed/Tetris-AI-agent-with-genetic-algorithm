@@ -107,7 +107,7 @@ def count_hole_segements_effect(board):
 def height_effect(board):
     maxes = height_each_col(board)
 
-    return max(max(maxes) - 8, 0)
+    return max(max(maxes) - 8, 0) ** 2
     
 
 
