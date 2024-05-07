@@ -58,12 +58,11 @@ class Chromosome:
                     # TODO: TEST IT LATER
                     # for the next_piece you could get the new_board from the first piece and recalculate the
                     # calc_move_data based on the next_piece
-                    '''
+                    
                     if(next_piece != None):
-                        for possible_col in range(-2,len(board[0])-2):
-                            best_next_r , next_score = self.best_play(move_data['new_board'],next_piece,None,possible_col)
-                            temp_score += next_score
-                    '''
+                        next_move_data = self.best_play(move_data['new_board'],next_piece,None)
+                        temp_score += next_move_data['score']
+                    
                     if temp_score > play_score:
                         play_score = temp_score
                         best_rotation = rot
