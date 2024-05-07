@@ -110,6 +110,7 @@ class GeneticAlgorithm:
             self.selection()
             print("--Best Score: ",self.chromosomes[0].fitness_score)
             HISTORY_GAME_SCORE.append(self.chromosomes[0].fitness_score)
+            print(self.chromosomes[0].genes)
             offspring_chrom = self.crossover()
             offspring_chrom = self.mutate(offspring_chrom)
             self.replace(offspring_chrom)
