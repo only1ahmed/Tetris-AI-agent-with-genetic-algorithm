@@ -27,6 +27,17 @@ def cal_board_heuristics(board):
 #             'four_rows': four_rows_effect(board)} 
 
 
+    # return {'aggregate_height': sum(heights),
+    #         'complete_lines': complete_lines_effect(board), 
+    #         'holes': holes_effect(board), 
+    #         'bumpiness': bumpiness_effect(heights),
+    #         'hole_segments': count_hole_segements_effect(board),
+    #         'height': height_effect(board),
+    #         'columns': columns_effect(board),
+    #         'one_rows': one_rows_effect(board),
+    #         'two_rows': two_rows_effect(board),
+    #         'three_rows': three_rows_effect(board),
+    #         'four_rows': four_rows_effect(board)} 
     return {'aggregate_height': sum(heights),
             'complete_lines': complete_lines_effect(board), 
             'holes': holes_effect(board), 
@@ -38,7 +49,6 @@ def cal_board_heuristics(board):
             'two_rows': 0,
             'three_rows': 0,
             'four_rows': 0} 
-
 def height_each_col(board):
     '''
     Returns a list of the height of each column in the board
