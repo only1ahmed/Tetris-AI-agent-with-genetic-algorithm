@@ -3,15 +3,16 @@ import heuristic_functions
 import random
 import numpy as np
 import pandas as pd
+import math
 
 NUM_OF_GENES = 11
 NUM_OF_CHROMOSOMES = 15
 NUM_OF_EVOLUTIONS = 5
 
 PERECENTAGE_OF_MUTATED = 0.3
-PERECENTAGE_OF_SELECTION = 0.35
+PERECENTAGE_OF_SELECTION = 0.05
 
-MAX_SCORE = 10000
+MAX_SCORE = 100000
 GAME_MODE = 2
 
 HISTORY_GAME_SCORE = []
@@ -30,15 +31,15 @@ class Chromosome:
     
     def update_fitness_score(self, game_score):
         #Normalize the game score
-        # self.fitness_score = 1/(1+game_score)
-        self.fitness_score = game_score
+        self.fitness_score = 1/(1+game_score)
+        # self.fitness_score = game_score
     
     def best_play(self,board,piece,next_piece):
         best_rotation = 0
         best_column = -2 #
         play_score = -100000
 
-        for column in range(-2, tb.BOARDWIDTH - 3):
+        for column in range(-2, tb.BOARDWIDTH - 2):
             for rot in range(len(tb.PIECES[piece['shape']])):
                 # use calc_move_data 
                 move_data = tb.calc_move_data(board, piece, column, rot)
@@ -112,7 +113,7 @@ class GeneticAlgorithm:
             self.selection()
             print("--Best Score: ",self.chromosomes[0].fitness_score)
             HISTORY_GAME_SCORE.append(self.chromosomes[0].fitness_score)
-            f = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)
+            f = sorted(self.chromosomes, key=lambda x: x.fitness_score)
             for i in f:
                 print(i.fitness_score, end=' ')
             print('\n')
@@ -145,20 +146,21 @@ class GeneticAlgorithm:
 
     def selection(self):
         # Update the chromosome list (delete the rest) ceil(Top 30%)
-        self.chromosomes = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)
-        self.chromosomes = self.chromosomes[0:int(len(self.chromosomes) * PERECENTAGE_OF_SELECTION)]
+        self.chromosomes = sorted(self.chromosomes, key=lambda x: x.fitness_score)
+        self.chromosomes = self.chromosomes[0:max(2, int(math.ceil(len(self.chromosomes) * PERECENTAGE_OF_SELECTION)))]
 
     def crossover(self): 
         # Return new chromosomes
         off_chroms = []
         num_of_offspring = NUM_OF_CHROMOSOMES - len(self.chromosomes)
-        for i in range(len(self.chromosomes)):
-            if(len(off_chroms) >= num_of_offspring):
-                    break
-            for j in range(i+1,len(self.chromosomes)):
+        while (len(off_chroms) < num_of_offspring):
+            for i in range(len(self.chromosomes)):
                 if(len(off_chroms) >= num_of_offspring):
-                    break
-                off_chroms.append(self.mating(self.chromosomes[i],self.chromosomes[j]))
+                        break
+                for j in range(i+1,len(self.chromosomes)):
+                    if(len(off_chroms) >= num_of_offspring):
+                        break
+                    off_chroms.append(self.mating(self.chromosomes[i],self.chromosomes[j]))
         return off_chroms
     
     def mating(self,chrom1,chrom2):
