@@ -350,7 +350,7 @@ def run_game():
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
+def run_game_ai(is_training, chromosome, max_score=100000, speed=FPS):
     # move = chromosome.best_play(board, falling_piece, next_piece)
             # falling_piece['rotation'] = move['best_rotation']
             # falling_piece['x'] = move['best_column']
@@ -359,7 +359,7 @@ def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
     main()
 
     FPS = speed
-    if(is_training): FPS = 300
+    if(is_training): FPS = 5000
     MAX_SCORE = max_score
 
     # SETUP VARIABLES
@@ -444,8 +444,8 @@ def run_game_ai(is_training, chromosome, max_score=5000, speed=FPS):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
         # DRAWING THE BOARD
-
-    return score + fitness_score
+    print(score)
+    return score
 ##############################################################################
 # GAME FUNCTIONS
 ##############################################################################

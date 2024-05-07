@@ -46,7 +46,7 @@ def complete_lines_effect(board):
     Removes the completed lines and 
     Returns the number of removed lines
     '''
-    return tb.remove_complete_lines(board) ** 2
+    return tb.remove_complete_lines(board) ** 6
 
 def holes_effect(board):
     '''
@@ -107,7 +107,7 @@ def count_hole_segements_effect(board):
 def height_effect(board):
     maxes = height_each_col(board)
 
-    return max(max(maxes) - 8, 0)
+    return max(max(maxes) - 8, 0) ** 2
     
 
 
@@ -236,6 +236,6 @@ def four_rows_effect(board):
                     break;
                 row-=1
             row+=1
-            if seg_cnt >= 4:
+            if seg_cnt == 4:
                 sum+=1
     return sum * 4

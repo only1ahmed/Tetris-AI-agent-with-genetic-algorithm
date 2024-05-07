@@ -8,8 +8,8 @@ NUM_OF_GENES = 11
 NUM_OF_CHROMOSOMES = 15
 NUM_OF_EVOLUTIONS = 5
 
-PERECENTAGE_OF_MUTATED = 0.2
-PERECENTAGE_OF_SELECTION = 0.3
+PERECENTAGE_OF_MUTATED = 0.3
+PERECENTAGE_OF_SELECTION = 0.35
 
 MAX_SCORE = 10000
 GAME_MODE = 2
@@ -24,13 +24,14 @@ class Chromosome:
         if genes == None:
             self.genes = []
             for i in range(NUM_OF_GENES):
-                self.genes.append(random.uniform(-10,10))
+                self.genes.append(random.uniform(-10.0,10.0))
         else:
             self.genes = genes
     
     def update_fitness_score(self, game_score):
         #Normalize the game score
-        self.fitness_score = 1/(1+game_score)
+        # self.fitness_score = 1/(1+game_score)
+        self.fitness_score = game_score
     
     def best_play(self,board,piece,next_piece):
         best_rotation = 0
@@ -107,20 +108,26 @@ class GeneticAlgorithm:
         for i in range(self.NUM_OF_GENERATIONS):
             print("Training Generation: [", i,"/ ",self.NUM_OF_GENERATIONS,"]")
             self.cal_fitness()
+            print(self.chromosomes[0].genes)
             self.selection()
             print("--Best Score: ",self.chromosomes[0].fitness_score)
             HISTORY_GAME_SCORE.append(self.chromosomes[0].fitness_score)
+            f = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)
+            for i in f:
+                print(i.fitness_score, end=' ')
+            print('\n')
             offspring_chrom = self.crossover()
             offspring_chrom = self.mutate(offspring_chrom)
             self.replace(offspring_chrom)
-        
+            
         # Return the best chromosome
         #TODO: make sure to return the best chromosome
         # Save the HISTORY GAME SCORE to a file
         print("HISTORY GAME SCORE: ",HISTORY_GAME_SCORE)
         
         
-        optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)[0]
+        optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse = True)[0]
+        print(sorted(self.chromosomes, key=lambda x: x.fitness_score))
         return optimal_chromosome
 
     '''
@@ -139,7 +146,7 @@ class GeneticAlgorithm:
     def selection(self):
         # Update the chromosome list (delete the rest) ceil(Top 30%)
         self.chromosomes = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse=True)
-        self.chromosomes = self.chromosomes[int(len(self.chromosomes) * PERECENTAGE_OF_SELECTION):]
+        self.chromosomes = self.chromosomes[0:int(len(self.chromosomes) * PERECENTAGE_OF_SELECTION)]
 
     def crossover(self): 
         # Return new chromosomes
@@ -177,9 +184,8 @@ class GeneticAlgorithm:
             # eliminate randomly
         num_of_mutated = int(len(off_chroms) * PERECENTAGE_OF_MUTATED)
         for i in range(num_of_mutated):
-            rand_chrom = random.choice(off_chroms)
-            rand_gene = random.randint(0,len(rand_chrom.genes)-1)
-            rand_chrom.genes[rand_gene] += random.uniform(-0.1,0.1)         
+            randi = random.randint(0,(NUM_OF_GENES * len(off_chroms))-1)
+            off_chroms[randi//NUM_OF_GENES].genes[randi % NUM_OF_GENES] += random.uniform(-0.1,0.1)         
         return off_chroms
     
     def replace(self,off_chroms):
