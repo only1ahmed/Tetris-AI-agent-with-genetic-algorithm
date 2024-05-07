@@ -350,12 +350,7 @@ def run_game():
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-def run_game_ai(is_training, chromosome, max_score=100000, speed=FPS):
-    # move = chromosome.best_play(board, falling_piece, next_piece)
-            # falling_piece['rotation'] = move['best_rotation']
-            # falling_piece['x'] = move['best_column']
-            # fitness_score = move['score']
-    #TODO: Dangerous
+def run_game_ai(is_training, chromosome, max_score=10000, speed=FPS):
     main()
 
     FPS = speed
@@ -379,7 +374,9 @@ def run_game_ai(is_training, chromosome, max_score=100000, speed=FPS):
     # GAME LOOP
     while not is_game_ended: 
         check_quit()
-
+        if(score >= MAX_SCORE):
+            is_game_ended = True
+            win = True
         # CALCULATING MOVES
         if(falling_piece == None):
             # No falling piece in play, so start a new piece at the top
@@ -444,7 +441,19 @@ def run_game_ai(is_training, chromosome, max_score=100000, speed=FPS):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
         # DRAWING THE BOARD
-    print(score)
+    if(win):
+        print("-----------------------------------------------------")
+        print("Chromosome wins with score: ", score)
+        print("Chromosome Genes: ", chromosome.genes)
+        print("-----------------------------------------------------")
+
+    else:
+        print("-----------------------------------------------------")
+        print("GAME OVER with score: ", score)
+        print("Chromosome Genes: ", chromosome.genes)
+        print("-----------------------------------------------------")
+
+
     return score
 ##############################################################################
 # GAME FUNCTIONS
@@ -717,7 +726,6 @@ def draw_next_piece(piece):
 # GAME STATISTICS FUNCTIONS
 ##############################################################################
 def calc_move_data(board, piece, x, r,):
-    #TODO:    
     piece['rotation'] = r
     piece['y'] = 0
     piece['x'] = x
