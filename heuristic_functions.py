@@ -1,40 +1,55 @@
 import numpy as np
 import tetris_base as tb
-'''
-Start with those first:
-aggregate height, 
-complete lines, 
-holes,  
-bumpiness,
-'''
+
+
+HEURISTIC_NAMES = [
+    'aggregate_height',
+    'complete_lines', 
+    'holes', 
+    'bumpiness',
+    'hole_segments',
+    'max_height',
+    'empty_columns',
+    'one_rows',
+    'two_rows',
+    'three_rows',
+    'four_rows'
+]
+
+
 BLANK = '.'
 
-def cal_board_heuristics(board):
+def cal_board_heuristics(board, heuristic_to_use = HEURISTIC_NAMES):
 
     heights = height_each_col(board)
+    cal_data = {}
 
-    # return {'aggregate_height': sum(heights),
-    #         'complete_lines': complete_lines_effect(board), 
-    #         'holes': holes_effect(board), 
-    #         'bumpiness': bumpiness_effect(heights),
-    #         'hole_segments': count_hole_segements_effect(board),
-    #         'height': height_effect(board),
-    #         'columns': columns_effect(board),
-    #         'one_rows': one_rows_effect(board),
-    #         'two_rows': two_rows_effect(board),
-    #         'three_rows': three_rows_effect(board),
-    #         'four_rows': four_rows_effect(board)} 
-    return {'aggregate_height': sum(heights),
-            'complete_lines': complete_lines_effect(board), 
-            'holes': holes_effect(board), 
-            'bumpiness': bumpiness_effect(heights),
-            'hole_segments': 0,
-            'height': 0,
-            'columns': 0,
-            'one_rows': 0,
-            'two_rows': 0,
-            'three_rows': 0,
-            'four_rows': 0}
+    for heuristic in heuristic_to_use:
+        
+        if heuristic == 'aggregate_height':
+            cal_data['aggregate_height'] = sum(heights)
+        elif heuristic == 'complete_lines':
+            cal_data['complete_lines'] = complete_lines_effect(board)
+        elif heuristic == 'holes':
+            cal_data['holes'] = holes_effect(board)
+        elif heuristic == 'bumpiness':
+            cal_data['bumpiness'] = bumpiness_effect(heights)
+        elif heuristic == 'hole_segments':
+            cal_data['hole_segments'] = count_hole_segements_effect(board)
+        elif heuristic == 'max_height':
+            cal_data['max_height'] = height_effect(board)
+        elif heuristic == 'empty_columns':
+            cal_data['empty_columns'] = columns_effect(board)
+        elif heuristic == 'one_rows':
+            cal_data['one_rows'] = one_rows_effect(board)
+        elif heuristic == 'two_rows':
+            cal_data['two_rows'] = two_rows_effect(board)
+        elif heuristic == 'three_rows':
+            cal_data['three_rows'] = three_rows_effect(board)
+        elif heuristic == 'four_rows':
+            cal_data['four_rows'] = four_rows_effect(board)
+
+    return cal_data
  
 def height_each_col(board):
     '''

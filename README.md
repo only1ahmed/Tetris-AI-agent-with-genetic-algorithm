@@ -61,3 +61,28 @@ There are two suggested role divisions:
 We may vote for which you think is best.
 
 **Final thing, search your name on the code to know what you should implement.**
+
+# **Tasks**
+Stuff to get from the Tetris AI:
+- Make a log file of the values. Save the optimal values (values that got you the highest score).
+- You can choose whatever seed you wish, just keep it in the code and write it in the
+report. (while generating the pieces)
+- Run the game for 300-500 iterations (pieces/plays) for training and for the final test run 600
+iterations using the optimal contribution factors found. Write them down in a separate code file and
+run and save the score for this run
+- You are required to submit the code file you’ve used and
+a final code for the optimal run. Separate the optimal run in another code file. Put in it the same
+code, without the evolution part and with the optimal found values of the factors and run it for the
+requested number of iterations
+- Show the progress of the best two chromosomes in all states
+(show their score in a graph). (basically the score progress of the two best chromosomes)
+
+
+
+
+- We need to get those data from 'tetris_base.py' inside the function of run_game_ai.py
+- And also from 'model.py'.
+- Implement a save and load functionality ✅(using csv files or text files)
+- Save the collected data
+  - 
+- Do them Fancy Graphs

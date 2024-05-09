@@ -173,18 +173,18 @@ MANUAL_GAME = False
 ##############################################################################
 # MAIN GAME
 ##############################################################################
-def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
-    pygame.init()
+# def main():
+global FPSCLOCK, DISPLAYSURF, BASICFONT, BIGFONT
+pygame.init()
 
-    FPSCLOCK    = pygame.time.Clock()
-    DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    BASICFONT   = pygame.font.Font('freesansbold.ttf', 18)
-    BIGFONT     = pygame.font.Font('freesansbold.ttf', 100)
-    pygame.display.set_caption('Tetris AI')
+FPSCLOCK    = pygame.time.Clock()
+DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
+BASICFONT   = pygame.font.Font('freesansbold.ttf', 18)
+BIGFONT     = pygame.font.Font('freesansbold.ttf', 100)
+pygame.display.set_caption('Tetris AI')
 
-    # if (MANUAL_GAME):
-    #     run_game()
+# if (MANUAL_GAME):
+#     run_game()
 
 
 def run_game():
@@ -350,18 +350,23 @@ def run_game():
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-def run_game_ai(is_training, chromosome, max_score=10000, speed=FPS):
-    main()
+def run_game_ai(is_training, chromosome, 
+                is_piece_limited = False ,is_score_limited = True, 
+                max_score=10000, max_pieces=500, 
+                speed=FPS):
+    # I want to limit based on the number of pieces
+    # I want to make a normal auto_game mode
+    print("-----------------------------------------------------")
+    print("Chromosome Genes: ", chromosome.genes)
 
     FPS = speed
-    if(is_training): FPS = 5000
-    MAX_SCORE = max_score
+    if(is_training): FPS = 100000
 
     # SETUP VARIABLES
     board              = get_blank_board()
     last_fall_time     = time.time()
     score              = 0
-    fitness_score      = 0
+    num_of_pieces      = 0
     level, fall_freq   = calc_level_and_fall_freq(score)
 
     falling_piece      = get_new_piece()
@@ -371,22 +376,33 @@ def run_game_ai(is_training, chromosome, max_score=10000, speed=FPS):
     win = False  # if the AI achieves the MAX_SCORE
 
     chromosome.best_play(board,falling_piece,next_piece)
+    chromosome.game_score_history = []
+    chromosome.game_score_history.append(score)
     # GAME LOOP
     while not is_game_ended: 
         check_quit()
-        if(score >= MAX_SCORE):
-            is_game_ended = True
+        pygame.event.get()
+        # Checking for the winning condition
+        score_achieved = (score >= max_score)
+        piece_achieved = (num_of_pieces >= max_pieces)
+
+        if(is_piece_limited and not is_score_limited and piece_achieved):
             win = True
+        elif(not is_piece_limited and is_score_limited and score_achieved):
+            win = True
+        elif(is_piece_limited and is_score_limited and (piece_achieved or score_achieved)):
+            #whichever happens first
+            win = True
+        if(win): is_game_ended = True
+
+
         # CALCULATING MOVES
         if(falling_piece == None):
             # No falling piece in play, so start a new piece at the top
             falling_piece = next_piece
             next_piece    = get_new_piece()
 
-            # move['score'] = current fitness score (which we calculated by getting the heuristics in best_play)
-
             move = chromosome.best_play(board,falling_piece,next_piece)
-            # fitness_score += move['score']
             # Reset last_fall_time
             last_fall_time = time.time()
 
@@ -405,7 +421,7 @@ def run_game_ai(is_training, chromosome, max_score=10000, speed=FPS):
 
                 #Adding the Score for a successful landing
                 score += 1
-
+                num_of_pieces += 1
                 # Bonus score for complete lines at once
                 # 40   pts for 1 line
                 # 120  pts for 2 lines
@@ -424,6 +440,8 @@ def run_game_ai(is_training, chromosome, max_score=10000, speed=FPS):
                 level, fall_freq = calc_level_and_fall_freq(score)
                 falling_piece    = None
 
+                # Updating the Chromose Game History
+                chromosome.game_score_history.append(score)
             else:
                 # Piece did not land, just move the piece down
                 falling_piece['y'] += 1
@@ -441,16 +459,13 @@ def run_game_ai(is_training, chromosome, max_score=10000, speed=FPS):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
         # DRAWING THE BOARD
+    
     if(win):
-        print("-----------------------------------------------------")
-        print("Chromosome wins with score: ", score)
-        print("Chromosome Genes: ", chromosome.genes)
+        print("WON with Score: ", score)
         print("-----------------------------------------------------")
 
     else:
-        print("-----------------------------------------------------")
         print("GAME OVER with score: ", score)
-        print("Chromosome Genes: ", chromosome.genes)
         print("-----------------------------------------------------")
 
 
@@ -725,7 +740,7 @@ def draw_next_piece(piece):
 ##############################################################################
 # GAME STATISTICS FUNCTIONS
 ##############################################################################
-def calc_move_data(board, piece, x, r,):
+def calc_move_data(board, piece, x, r,heuristics_names=heuristic_functions.HEURISTIC_NAMES):
     piece['rotation'] = r
     piece['y'] = 0
     piece['x'] = x
@@ -749,7 +764,7 @@ def calc_move_data(board, piece, x, r,):
     
     # Throw them in heuristic functions based on new_board
     board_data = {}
-    cal_data = heuristic_functions.cal_board_heuristics(new_board)
+    cal_data = heuristic_functions.cal_board_heuristics(new_board,heuristics_names)
     board_data['cal_data'] = cal_data
     board_data['new_board'] = new_board
     board_data['is_valid'] = True

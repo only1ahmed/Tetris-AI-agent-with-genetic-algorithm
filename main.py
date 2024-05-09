@@ -1,7 +1,10 @@
 import tetris_base as tb
 import numpy as np
 import model
-NUM_OF_GENERATIONS = 40
-GA = model.GeneticAlgorithm(NUM_OF_GENERATIONS)
-GA.init_chromosomes()
+
+GA = model.GeneticAlgorithm(num_of_generations=2,
+                            max_score= 1000,
+                            heuristic_names=['aggregate_height','complete_lines', 'holes', 'bumpiness',])
+GA.load_chromosomes("new_chromosomes.csv")
 GA.train()
+GA.save_history()
