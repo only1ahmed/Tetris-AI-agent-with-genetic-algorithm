@@ -129,7 +129,7 @@ class GeneticAlgorithm:
         # Save the training history to a file
         history_df = pd.DataFrame(columns=['Generation','Best Score']+self.HEURISTIC_NAMES)
         for i, data in enumerate(self.training_history):
-            history_df.loc[i] =data
+            history_df.loc[i] = data
         history_df.to_csv(file_name, index=False)
 
     
@@ -139,7 +139,9 @@ class GeneticAlgorithm:
             self.chromosomes.append(Chromosome(heuristic_names=self.HEURISTIC_NAMES,calculate_next_move=self.NEXT_MOVE))
 
     def train(self):
-    
+
+        self.optimal_chromosome = None
+        best_score = -10000
         for i in range(self.NUM_OF_GENERATIONS):
             print("Training Generation: [", i,"/ ",self.NUM_OF_GENERATIONS,"]")
             self.cal_fitness()
@@ -147,12 +149,17 @@ class GeneticAlgorithm:
             temp_row = [i , self.chromosomes[0].fitness_score]
             temp_row = temp_row + self.chromosomes[0].genes
             self.training_history.append(temp_row)
+            if self.chromosomes[0].fitness_score > best_score:
+                self.optimal_chromosome = self.chromosomes[0]
+                best_score = self.chromosomes[0].fitness_score
             offspring_chrom = self.crossover()
             offspring_chrom = self.mutate(offspring_chrom)
             self.replace(offspring_chrom)
-                    
-    
-        self.optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse = True)[0]
+
+
+
+
+        #self.optimal_chromosome = sorted(self.chromosomes, key=lambda x: x.fitness_score, reverse = True)[0]
         print("Training Completed")
         print("Optimal Chromosome: ",self.optimal_chromosome.genes)
         tb.check_quit()
