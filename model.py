@@ -6,8 +6,12 @@ import pandas as pd
 import math
 
 class Chromosome:
-    def __init__(self,genes = [],heuristic_names = hf.HEURISTIC_NAMES):
+    def __init__(self,
+                 genes = [],
+                 calculate_next_move = False,
+                 heuristic_names = hf.HEURISTIC_NAMES):
         self.NUM_OF_GENES = len(heuristic_names)
+        self.NEXT_MOVE = calculate_next_move
 
         self.genes = genes
         self.fitness_score = 0
@@ -40,9 +44,10 @@ class Chromosome:
                     # calculate the score for each rotation and return the best rotation and its score
                     temp_score = np.array(self.genes)
                     temp_score = np.dot(temp_score, np.array(list(move_data['cal_data'].values())))
-                    # if(next_piece != None):
-                    #     next_move_data = self.best_play(move_data['new_board'],next_piece,None)
-                    #     temp_score += next_move_data['score']
+
+                    if(next_piece != None and self.NEXT_MOVE):
+                        next_move_data = self.best_play(move_data['new_board'],next_piece,None)
+                        temp_score += next_move_data['score']
                     
                     if temp_score > play_score:
                         play_score = temp_score
@@ -71,19 +76,22 @@ class GeneticAlgorithm:
                  perecentage_of_mutated=0.2, 
                  perecentage_of_selection=0.35, 
                  max_score = 100_000, max_piece = 500, 
-                 limit_score = True, limit_piece = False, 
+                 limit_score = True, limit_piece = False,
+                 calculate_next_move = False, 
                  heuristic_names=hf.HEURISTIC_NAMES):
         
-        self.NUM_OF_GENERATIONS = num_of_generations
-        self.NUM_OF_CHROMOSOMES = num_of_chromosomes
-        self.NUM_OF_GENES = len(heuristic_names)
-        self.PERECENTAGE_OF_MUTATED = perecentage_of_mutated
+        self.NUM_OF_GENERATIONS       = num_of_generations
+        self.NUM_OF_CHROMOSOMES       = num_of_chromosomes
+        self.NUM_OF_GENES             = len(heuristic_names)
+        self.PERECENTAGE_OF_MUTATED   = perecentage_of_mutated
         self.PERECENTAGE_OF_SELECTION = perecentage_of_selection
-        self.MAX_SCORE = max_score
-        self.MAX_PIECE = max_piece
-        self.LIMIT_SCORE = limit_score
-        self.LIMIT_PIECE = limit_piece
-        self.HEURISTIC_NAMES = heuristic_names
+        self.MAX_SCORE                = max_score
+        self.MAX_PIECE                = max_piece
+        self.LIMIT_SCORE              = limit_score
+        self.LIMIT_PIECE              = limit_piece
+        self.NEXT_MOVE                = calculate_next_move
+        self.HEURISTIC_NAMES          = heuristic_names
+
 
         self.chromosomes = []   # List of Chromosomes
         self.optimal_chromosome = None
@@ -99,29 +107,29 @@ class GeneticAlgorithm:
         chromo_df = pd.read_csv(file_name)
         for _, row in chromo_df.iterrows():
             row = row.to_list()
-            self.chromosomes.append(Chromosome(heuristic_names=self.HEURISTIC_NAMES,genes=row))
+            self.chromosomes.append(Chromosome(heuristic_names=self.HEURISTIC_NAMES,genes=row,calculate_next_move=self.NEXT_MOVE))
         
         return self.chromosomes
                 
-    def save_chromosomes(self,file_name):
+    def save_chromosomes(self,file_name = "chromosomes.csv"):
         # Save the chromosomes to a file
         chromo_df = pd.DataFrame(columns=self.HEURISTIC_NAMES)
         for i, chrom in enumerate(self.chromosomes):
             chromo_df.loc[i] = chrom.genes
         chromo_df.to_csv(file_name, index=False)
 
-    def save_history(self):
+    def save_history(self,file_name = "training_history.csv"):
         # Save the training history to a file
         history_df = pd.DataFrame(columns=['Generation','Best Score']+self.HEURISTIC_NAMES)
         for i, data in enumerate(self.training_history):
             history_df.loc[i] =data
-        history_df.to_csv('training_history.csv', index=False)
+        history_df.to_csv(file_name, index=False)
 
     
 
     def init_chromosomes(self):
         for i in range(self.NUM_OF_CHROMOSOMES):
-            self.chromosomes.append(Chromosome(heuristic_names=self.HEURISTIC_NAMES))
+            self.chromosomes.append(Chromosome(heuristic_names=self.HEURISTIC_NAMES,calculate_next_move=self.NEXT_MOVE))
 
     def train(self):
     
@@ -181,7 +189,7 @@ class GeneticAlgorithm:
         off_gene = np.array(temp_gene_p1)*(chrom1.fitness_score/total_fitness) \
                   + np.array(temp_gene_p2)*(chrom2.fitness_score/total_fitness)
         off_gene = off_gene.tolist()
-        return Chromosome(heuristic_names=self.HEURISTIC_NAMES,genes=off_gene)
+        return Chromosome(heuristic_names=self.HEURISTIC_NAMES,genes=off_gene,calculate_next_move=self.NEXT_MOVE)
 
     def mutate(self,off_chroms):
         # mutated chromosomes

@@ -4,7 +4,8 @@ import model
 
 GA = model.GeneticAlgorithm(num_of_generations=2,
                             max_score= 1000,
-                            heuristic_names=['aggregate_height','complete_lines', 'holes', 'bumpiness',])
-GA.load_chromosomes("new_chromosomes.csv")
+                            calculate_next_move=False,
+                            heuristic_names=['aggregate_height','complete_lines', 'holes', 'bumpiness','four_rows'])
+GA.load_chromosomes("saved_chromosome.csv")
 GA.train()
-GA.save_history()
+GA.save_history("training_history.csv")
