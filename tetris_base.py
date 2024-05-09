@@ -184,7 +184,7 @@ DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 BASICFONT   = pygame.font.Font('freesansbold.ttf', 18)
 BIGFONT     = pygame.font.Font('freesansbold.ttf', 100)
 pygame.display.set_caption('Tetris AI')
-
+random.seed(RANDOM_SEED)
 # if (MANUAL_GAME):
 #     run_game()
 
@@ -554,7 +554,6 @@ def calc_level_and_fall_freq(score):
 
 def get_new_piece():
     """Return a random new piece in a random rotation and color"""
-    random.seed(RANDOM_SEED)
     
     shape     = random.choice(list(PIECES.keys()))
     new_piece = {'shape': shape,

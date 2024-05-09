@@ -26,6 +26,13 @@ class Chromosome:
     def update_fitness_score(self, game_score):
         self.fitness_score = game_score
 
+    def save_history(self,file_name="chromosome_game_score_history.csv"):
+        history_df = pd.DataFrame(columns=['Move Number','Best Score'])
+        for i, data in enumerate(self.game_score_history):
+            history_df.loc[i] = [i,data]
+        history_df.to_csv(file_name, index=False)
+
+
     def best_play(self,board,piece,next_piece):
         '''
         Returns the best play for the current piece and the score of the play
