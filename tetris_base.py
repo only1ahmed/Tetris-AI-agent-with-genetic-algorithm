@@ -170,6 +170,8 @@ PIECES = {'S': S_SHAPE_TEMPLATE,
 # Define if the game is manual or not
 MANUAL_GAME = False
 
+RANDOM_SEED = 42
+
 ##############################################################################
 # MAIN GAME
 ##############################################################################
@@ -552,7 +554,8 @@ def calc_level_and_fall_freq(score):
 
 def get_new_piece():
     """Return a random new piece in a random rotation and color"""
-
+    random.seed(RANDOM_SEED)
+    
     shape     = random.choice(list(PIECES.keys()))
     new_piece = {'shape': shape,
                 'rotation': random.randint(0, len(PIECES[shape]) - 1),
