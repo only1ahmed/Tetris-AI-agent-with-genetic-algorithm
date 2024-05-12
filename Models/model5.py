@@ -8,7 +8,7 @@ import pandas as pd
 ### (Model 5) ###
 
 model_5 = model.GeneticAlgorithm(num_of_generations=10,
-                                 max_score=100000,
+                                 max_score=500000,
                                  calculate_next_move=True,
                                  heuristic_names=['aggregate_height',
                                                   'complete_lines',

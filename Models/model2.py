@@ -9,7 +9,7 @@ import pandas as pd
 print("MODEL 2")
 
 model_2 = model.GeneticAlgorithm(num_of_generations=10,
-                                 max_score=100000,
+                                 max_score=500000,
                                  heuristic_names=['one_rows', 'two_rows', 'three_rows', 'four_rows'])
 
 model_2.init_chromosomes()
